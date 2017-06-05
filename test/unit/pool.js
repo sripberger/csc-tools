@@ -12,6 +12,12 @@ describe('Pool', function() {
 		expect(pool.players).to.equal(players);
 	});
 
+	it('defaults to an empty array of players', function() {
+		let pool = new Pool();
+
+		expect(pool.players).to.deep.equal([]);
+	});
+
 	describe('#countCollisions', function() {
 		let pool;
 
