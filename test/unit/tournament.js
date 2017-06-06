@@ -27,6 +27,44 @@ describe('Tournament', function() {
 		expect(tournament.poolCount).to.equal(poolCount);
 	});
 
+	it('defaults to empty player array with a pool count of 1', function() {
+		let tournament = new Tournament();
+
+		expect(tournament.players).to.deep.equal([]);
+		expect(tournament.poolCount).to.equal(1);
+	});
+
+	describe('#getRegionCounts', function() {
+		let tournament;
+
+		beforeEach(function() {
+			tournament = new Tournament([
+				{ tag: 'dude' },
+				{ tag: 'bro' }
+			]);
+			sandbox.stub(utils, 'getRegionCounts').returns({ foo: 1, bar: 2 });
+		});
+
+		it('returns region counts using utils::getRegionCounts', function() {
+			let result = tournament.getRegionCounts();
+
+			expect(utils.getRegionCounts).to.be.calledOnce;
+			expect(utils.getRegionCounts).to.be.calledOn(utils);
+			expect(utils.getRegionCounts).to.be.calledWith(tournament.players);
+			expect(result).to.deep.equal({ foo: 1, bar: 2 });
+		});
+
+		it('caches result', function() {
+			tournament.getRegionCounts();
+			utils.getRegionCounts.reset();
+
+			let result = tournament.getRegionCounts();
+
+			expect(utils.getRegionCounts).to.not.be.called;
+			expect(result).to.deep.equal({ foo: 1, bar: 2 });
+		});
+	});
+
 	describe('#getPools', function() {
 		it('arranges players into pools using utils::getPoolIndex', function() {
 			let players = [
@@ -69,15 +107,12 @@ describe('Tournament', function() {
 		let tournament;
 
 		beforeEach(function() {
-			tournament = new Tournament([
-				{ tag: 'dude' },
-				{ tag: 'bro' }
-			], 4);
-			sandbox.stub(utils, 'getRegionCounts');
+			tournament = new Tournament([], 4);
+			sinon.stub(tournament, 'getRegionCounts');
 		});
 
 		it('returns smallest possible collision score based on region counts', function() {
-			utils.getRegionCounts.returns({
+			tournament.getRegionCounts.returns({
 				foo: 5, // 1 single collision
 				bar: 7, // 3 single collisions
 				baz: 4, // 0 collisions
@@ -86,14 +121,13 @@ describe('Tournament', function() {
 
 			let result = tournament.getMinimumCollisionScore();
 
-			expect(utils.getRegionCounts).to.be.calledOnce;
-			expect(utils.getRegionCounts).to.be.calledOn(utils);
-			expect(utils.getRegionCounts).to.be.calledWith(tournament.players);
+			expect(tournament.getRegionCounts).to.be.calledOnce;
+			expect(tournament.getRegionCounts).to.be.calledOn(tournament);
 			expect(result).to.equal(4);
 		});
 
 		it('accounts for collisions with more than one duplicate', function() {
-			utils.getRegionCounts.returns({
+			tournament.getRegionCounts.returns({
 				foo: 9, // 3 single collisions, 1 double collision, (3 * 1) + (1 * 3) = 6
 				bar: 15, // 1 double collision, 3 triple collisions, (1 * 3) + (3 * 6) = 21
 				baz: 8, // 4 single collisions, (4 * 1)  = 4
@@ -104,7 +138,7 @@ describe('Tournament', function() {
 		});
 
 		it('ignores provided region, if any', function() {
-			utils.getRegionCounts.returns({
+			tournament.getRegionCounts.returns({
 				foo: 5, // Should be ignored
 				bar: 6 // 2 single collisions
 			});
