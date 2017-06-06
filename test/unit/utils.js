@@ -39,4 +39,23 @@ describe('utils', function() {
 			expect(utils.getPoolIndex(11, 4)).to.equal(3);
 		});
 	});
+
+	describe('::getRegionCounts', function() {
+		it('returns map from regions to number of players in each', function() {
+			let players = [
+				{ region: 'foo' },
+				{ region: 'bar' },
+				{ region: 'baz' },
+				{ region: 'bar' },
+				{ region: 'baz' },
+				{ region: 'baz' }
+			];
+
+			expect(utils.getRegionCounts(players)).to.deep.equal({
+				foo: 1,
+				bar: 2,
+				baz: 3
+			});
+		});
+	});
 });
