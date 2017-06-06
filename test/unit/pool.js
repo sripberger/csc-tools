@@ -34,11 +34,11 @@ describe('Pool', function() {
 		let pool;
 
 		beforeEach(function() {
-			sandbox.stub(utils, 'getRegionCounts');
 			pool = new Pool([
 				{ tag: 'dude' },
 				{ tag: 'bro' }
 			]);
+			sandbox.stub(utils, 'getRegionCounts');
 		});
 
 		it('returns number of colliding regions', function() {

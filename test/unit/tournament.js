@@ -64,4 +64,52 @@ describe('Tournament', function() {
 			expect(result[3].players).to.deep.equal([]);
 		});
 	});
+
+	describe('#getMinimumCollisionScore', function() {
+		let tournament;
+
+		beforeEach(function() {
+			tournament = new Tournament([
+				{ tag: 'dude' },
+				{ tag: 'bro' }
+			], 4);
+			sandbox.stub(utils, 'getRegionCounts');
+		});
+
+		it('returns smallest possible collision score based on region counts', function() {
+			utils.getRegionCounts.returns({
+				foo: 5, // 1 single collision
+				bar: 7, // 3 single collisions
+				baz: 4, // 0 collisions
+				qux: 3 // 0 collisions
+			});
+
+			let result = tournament.getMinimumCollisionScore();
+
+			expect(utils.getRegionCounts).to.be.calledOnce;
+			expect(utils.getRegionCounts).to.be.calledOn(utils);
+			expect(utils.getRegionCounts).to.be.calledWith(tournament.players);
+			expect(result).to.equal(4);
+		});
+
+		it('accounts for collisions with more than one duplicate', function() {
+			utils.getRegionCounts.returns({
+				foo: 9, // 3 single collisions, 1 double collision, (3 * 1) + (1 * 3) = 6
+				bar: 15, // 1 double collision, 3 triple collisions, (1 * 3) + (3 * 6) = 21
+				baz: 8, // 4 single collisions, (4 * 1)  = 4
+				qux: 3 // 0 collisions
+			});
+
+			expect(tournament.getMinimumCollisionScore()).to.equal(31);
+		});
+
+		it('ignores provided region, if any', function() {
+			utils.getRegionCounts.returns({
+				foo: 5, // Should be ignored
+				bar: 6 // 2 single collisions
+			});
+
+			expect(tournament.getMinimumCollisionScore('foo')).to.equal(2);
+		});
+	});
 });
