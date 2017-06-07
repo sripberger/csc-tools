@@ -65,6 +65,37 @@ describe('Tournament', function() {
 		});
 	});
 
+	describe('#getIgnoredRegion', function() {
+		let tournament;
+
+		beforeEach(function() {
+			tournament = new Tournament();
+			sinon.stub(tournament, 'getRegionCounts').returns({
+				foo: 1,
+				bar: 3,
+				baz: 2
+			});
+		});
+
+		it('returns the region with the highest count', function() {
+			let result = tournament.getIgnoredRegion();
+
+			expect(tournament.getRegionCounts).to.be.calledOnce;
+			expect(tournament.getRegionCounts).to.be.calledOn(tournament);
+			expect(result).to.equal('bar');
+		});
+
+		it('caches result', function() {
+			tournament.getIgnoredRegion();
+			tournament.getRegionCounts.reset();
+
+			let result = tournament.getIgnoredRegion();
+
+			expect(tournament.getRegionCounts).to.not.be.called;
+			expect(result).to.equal('bar');
+		});
+	});
+
 	describe('#getPools', function() {
 		it('arranges players into pools using utils::getPoolIndex', function() {
 			let players = [
