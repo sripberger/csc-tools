@@ -58,4 +58,31 @@ describe('utils', function() {
 			});
 		});
 	});
+
+	describe('::getMinimumCollisionScore', function() {
+		it('returns smallest possible collision score based on region counts and pool count', function() {
+			expect(utils.getMinimumCollisionScore({
+				foo: 4, // 1 single collision
+				bar: 5, // 2 single collisions
+				baz: 3, // 0 collisions
+				qux: 1 // 0 collisions
+			}, 3)).to.equal(3);
+		});
+
+		it('accounts for collisions with more than one duplicate', function() {
+			expect(utils.getMinimumCollisionScore({
+				foo: 9, // 3 single collisions, 1 double collision, (3 * 1) + (1 * 3) = 6
+				bar: 15, // 1 double collision, 3 triple collisions, (1 * 3) + (3 * 6) = 21
+				baz: 8, // 4 single collisions, (4 * 1)  = 4
+				qux: 3 // 0 collisions
+			}, 4)).to.equal(31);
+		});
+
+		it('supports ignoredRegion argument', function() {
+			expect(utils.getMinimumCollisionScore({
+				foo: 5, // Should be ignored
+				bar: 6 // 2 single collisions
+			}, 4, 'foo')).to.equal(2);
+		});
+	});
 });
