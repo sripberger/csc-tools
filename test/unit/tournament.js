@@ -56,7 +56,7 @@ describe('Tournament', function() {
 
 		it('caches result', function() {
 			tournament.getRegionCounts();
-			utils.getRegionCounts.reset();
+			utils.getRegionCounts.resetHistory();
 
 			let result = tournament.getRegionCounts();
 
@@ -87,7 +87,7 @@ describe('Tournament', function() {
 
 		it('caches result', function() {
 			tournament.getIgnoredRegion();
-			tournament.getRegionCounts.reset();
+			tournament.getRegionCounts.resetHistory();
 
 			let result = tournament.getIgnoredRegion();
 
@@ -125,7 +125,7 @@ describe('Tournament', function() {
 
 		it('caches nonzero result', function() {
 			tournament.getMinimumCollisionScore();
-			utils.getMinimumCollisionScore.reset();
+			utils.getMinimumCollisionScore.resetHistory();
 
 			let result = tournament.getMinimumCollisionScore();
 
@@ -136,7 +136,7 @@ describe('Tournament', function() {
 		it('caches zero result', function() {
 			utils.getMinimumCollisionScore.returns(0);
 			tournament.getMinimumCollisionScore();
-			utils.getMinimumCollisionScore.reset();
+			utils.getMinimumCollisionScore.resetHistory();
 
 			let result = tournament.getMinimumCollisionScore();
 
@@ -180,6 +180,59 @@ describe('Tournament', function() {
 			expect(result[2].players).to.deep.equal([ players[2], players[3] ]);
 			expect(result[3]).to.be.an.instanceof(Pool);
 			expect(result[3].players).to.deep.equal([]);
+		});
+	});
+
+	describe('#getCollisionScore', function() {
+		let tournament, fooPool, barPool;
+
+		beforeEach(function() {
+			tournament = new Tournament();
+			fooPool = new Pool([ { tag: 'foo' }]);
+			barPool = new Pool([ { tag: 'bar' }]);
+
+			sinon.stub(tournament, 'getIgnoredRegion').returns('baz');
+			sinon.stub(tournament, 'getPools').returns([ fooPool, barPool ]);
+			sinon.stub(fooPool, 'getCollisionScore').returns(2);
+			sinon.stub(barPool, 'getCollisionScore').returns(3);
+		});
+
+		it('returns sum of collision scores from all pools', function() {
+			let result = tournament.getCollisionScore();
+
+			expect(tournament.getIgnoredRegion).to.be.calledOnce;
+			expect(tournament.getIgnoredRegion).to.be.calledOn(tournament);
+			expect(tournament.getPools).to.be.calledOnce;
+			expect(tournament.getPools).to.be.calledOn(tournament);
+			expect(fooPool.getCollisionScore).to.be.calledOnce;
+			expect(fooPool.getCollisionScore).to.be.calledOn(fooPool);
+			expect(fooPool.getCollisionScore).to.be.calledWith('baz');
+			expect(barPool.getCollisionScore).to.be.calledOnce;
+			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
+			expect(barPool.getCollisionScore).to.be.calledWith('baz');
+			expect(result).to.equal(5);
+		});
+
+		it('caches nonzero result', function() {
+			tournament.getCollisionScore();
+			tournament.getPools.resetHistory();
+
+			let result = tournament.getCollisionScore();
+
+			expect(tournament.getPools).to.not.be.called;
+			expect(result).to.equal(5);
+		});
+
+		it('caches zero result', function() {
+			fooPool.getCollisionScore.returns(0);
+			barPool.getCollisionScore.returns(0);
+			tournament.getCollisionScore();
+			tournament.getPools.resetHistory();
+
+			let result = tournament.getCollisionScore();
+
+			expect(tournament.getPools).to.not.be.called;
+			expect(result).to.equal(0);
 		});
 	});
 });
