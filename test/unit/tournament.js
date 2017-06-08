@@ -235,4 +235,48 @@ describe('Tournament', function() {
 			expect(result).to.equal(0);
 		});
 	});
+
+	describe('#getFitnessScore', function() {
+		let tournament;
+
+		beforeEach(function() {
+			tournament = new Tournament();
+			sandbox.stub(tournament, 'getCollisionScore').returns(3);
+			sandbox.stub(tournament, 'getMinimumCollisionScore').returns(1);
+		});
+
+		it('returns inverse of difference between collision score and minimum', function() {
+			let result = tournament.getFitnessScore();
+
+			expect(tournament.getCollisionScore).to.be.calledOnce;
+			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
+			expect(tournament.getMinimumCollisionScore).to.be.calledOnce;
+			expect(tournament.getMinimumCollisionScore).to.be.calledOn(tournament);
+			expect(result).to.equal(0.5);
+		});
+
+		it('caches numeric result', function() {
+			tournament.getFitnessScore();
+			sandbox.resetHistory();
+
+			let result = tournament.getFitnessScore();
+
+			expect(tournament.getCollisionScore).to.be.not.be.called;
+			expect(tournament.getMinimumCollisionScore).to.not.be.called;
+			expect(result).to.equal(0.5);
+		});
+
+		it('caches NaN result', function() {
+			tournament.getCollisionScore.returns(NaN);
+			tournament.getMinimumCollisionScore.returns(NaN);
+			tournament.getFitnessScore();
+			sandbox.resetHistory();
+
+			let result = tournament.getFitnessScore();
+
+			expect(tournament.getCollisionScore).to.be.not.be.called;
+			expect(tournament.getMinimumCollisionScore).to.not.be.called;
+			expect(result).to.be.NaN;
+		});
+	});
 });
