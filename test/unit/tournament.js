@@ -14,135 +14,32 @@ describe('Tournament', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided player array and pool count', function() {
+	it('stores provided player array and settings', function() {
 		let players = [
 			{ tag: 'foo' },
 			{ tag: 'bar' }
 		];
-		let poolCount = 4;
+		let settings = {
+			poolCount: 4,
+			ignoredRegion: 'ignored region',
+			targetCollisionScore: 42,
+		};
 
-		let tournament = new Tournament(players, poolCount);
+		let tournament = new Tournament(players, settings);
 
 		expect(tournament.players).to.equal(players);
-		expect(tournament.poolCount).to.equal(poolCount);
+		expect(tournament.poolCount).to.equal(settings.poolCount);
+		expect(tournament.ignoredRegion).to.equal(settings.ignoredRegion);
+		expect(tournament.targetCollisionScore).to.equal(settings.targetCollisionScore);
 	});
 
-	it('defaults to empty player array with a pool count of 1', function() {
+	it('defaults to empty player array with default settings', function() {
 		let tournament = new Tournament();
 
 		expect(tournament.players).to.deep.equal([]);
 		expect(tournament.poolCount).to.equal(1);
-	});
-
-	describe('#getRegionCounts', function() {
-		let tournament;
-
-		beforeEach(function() {
-			tournament = new Tournament([
-				{ tag: 'dude' },
-				{ tag: 'bro' }
-			]);
-			sandbox.stub(utils, 'getRegionCounts').returns({ foo: 1, bar: 2 });
-		});
-
-		it('returns region counts using utils::getRegionCounts', function() {
-			let result = tournament.getRegionCounts();
-
-			expect(utils.getRegionCounts).to.be.calledOnce;
-			expect(utils.getRegionCounts).to.be.calledOn(utils);
-			expect(utils.getRegionCounts).to.be.calledWith(tournament.players);
-			expect(result).to.deep.equal({ foo: 1, bar: 2 });
-		});
-
-		it('caches result', function() {
-			tournament.getRegionCounts();
-			utils.getRegionCounts.resetHistory();
-
-			let result = tournament.getRegionCounts();
-
-			expect(utils.getRegionCounts).to.not.be.called;
-			expect(result).to.deep.equal({ foo: 1, bar: 2 });
-		});
-	});
-
-	describe('#getIgnoredRegion', function() {
-		let tournament;
-
-		beforeEach(function() {
-			tournament = new Tournament();
-			sinon.stub(tournament, 'getRegionCounts').returns({
-				foo: 1,
-				bar: 3,
-				baz: 2
-			});
-		});
-
-		it('returns the region with the highest count', function() {
-			let result = tournament.getIgnoredRegion();
-
-			expect(tournament.getRegionCounts).to.be.calledOnce;
-			expect(tournament.getRegionCounts).to.be.calledOn(tournament);
-			expect(result).to.equal('bar');
-		});
-
-		it('caches result', function() {
-			tournament.getIgnoredRegion();
-			tournament.getRegionCounts.resetHistory();
-
-			let result = tournament.getIgnoredRegion();
-
-			expect(tournament.getRegionCounts).to.not.be.called;
-			expect(result).to.equal('bar');
-		});
-	});
-
-	describe('#getMinimumCollisionScore', function() {
-		let tournament;
-
-		beforeEach(function() {
-			tournament = new Tournament([], 4);
-			sinon.stub(tournament, 'getRegionCounts').returns({ foo: 1, bar: 2 });
-			sinon.stub(tournament, 'getIgnoredRegion').returns('baz');
-			sandbox.stub(utils, 'getMinimumCollisionScore').returns(42);
-		});
-
-		it('returns minimum collison score using utils::getMinimumCollisionScore', function() {
-			let result = tournament.getMinimumCollisionScore();
-
-			expect(tournament.getRegionCounts).to.be.calledOnce;
-			expect(tournament.getRegionCounts).to.be.calledOn(tournament);
-			expect(tournament.getIgnoredRegion).to.be.calledOnce;
-			expect(tournament.getIgnoredRegion).to.be.calledOn(tournament);
-			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
-			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
-			expect(utils.getMinimumCollisionScore).to.be.calledWith(
-				{ foo: 1, bar: 2 },
-				tournament.poolCount,
-				'baz'
-			);
-			expect(result).to.equal(42);
-		});
-
-		it('caches nonzero result', function() {
-			tournament.getMinimumCollisionScore();
-			utils.getMinimumCollisionScore.resetHistory();
-
-			let result = tournament.getMinimumCollisionScore();
-
-			expect(utils.getMinimumCollisionScore).to.not.be.called;
-			expect(result).to.equal(42);
-		});
-
-		it('caches zero result', function() {
-			utils.getMinimumCollisionScore.returns(0);
-			tournament.getMinimumCollisionScore();
-			utils.getMinimumCollisionScore.resetHistory();
-
-			let result = tournament.getMinimumCollisionScore();
-
-			expect(utils.getMinimumCollisionScore).to.not.be.called;
-			expect(result).to.equal(0);
-		});
+		expect(tournament.ignoredRegion).to.be.null;
+		expect(tournament.targetCollisionScore).to.equal(0);
 	});
 
 	describe('#getPools', function() {
@@ -154,7 +51,7 @@ describe('Tournament', function() {
 				{ tag: 'qux'}
 			];
 			let poolCount = 4;
-			let tournament = new Tournament(players, poolCount);
+			let tournament = new Tournament(players, { poolCount });
 			sandbox.stub(utils, 'getPoolIndex')
 				.withArgs(0, poolCount).returns(0)
 				.withArgs(1, poolCount).returns(1)
@@ -187,39 +84,38 @@ describe('Tournament', function() {
 		let tournament, fooPool, barPool;
 
 		beforeEach(function() {
-			tournament = new Tournament();
+			tournament = new Tournament([], { ignoredRegion: 'baz' });
 			fooPool = new Pool([ { tag: 'foo' }]);
 			barPool = new Pool([ { tag: 'bar' }]);
 
-			sinon.stub(tournament, 'getIgnoredRegion').returns('baz');
-			sinon.stub(tournament, 'getPools').returns([ fooPool, barPool ]);
-			sinon.stub(fooPool, 'getCollisionScore').returns(2);
-			sinon.stub(barPool, 'getCollisionScore').returns(3);
+			sandbox.stub(tournament, 'getPools').returns([ fooPool, barPool ]);
+			sandbox.stub(fooPool, 'getCollisionScore').returns(2);
+			sandbox.stub(barPool, 'getCollisionScore').returns(3);
 		});
 
 		it('returns sum of collision scores from all pools', function() {
 			let result = tournament.getCollisionScore();
 
-			expect(tournament.getIgnoredRegion).to.be.calledOnce;
-			expect(tournament.getIgnoredRegion).to.be.calledOn(tournament);
 			expect(tournament.getPools).to.be.calledOnce;
 			expect(tournament.getPools).to.be.calledOn(tournament);
 			expect(fooPool.getCollisionScore).to.be.calledOnce;
 			expect(fooPool.getCollisionScore).to.be.calledOn(fooPool);
-			expect(fooPool.getCollisionScore).to.be.calledWith('baz');
+			expect(fooPool.getCollisionScore).to.be.calledWith(tournament.ignoredRegion);
 			expect(barPool.getCollisionScore).to.be.calledOnce;
 			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
-			expect(barPool.getCollisionScore).to.be.calledWith('baz');
+			expect(barPool.getCollisionScore).to.be.calledWith(tournament.ignoredRegion);
 			expect(result).to.equal(5);
 		});
 
 		it('caches nonzero result', function() {
 			tournament.getCollisionScore();
-			tournament.getPools.resetHistory();
+			sandbox.resetHistory();
 
 			let result = tournament.getCollisionScore();
 
 			expect(tournament.getPools).to.not.be.called;
+			expect(fooPool.getCollisionScore).to.not.be.called;
+			expect(barPool.getCollisionScore).to.not.be.called;
 			expect(result).to.equal(5);
 		});
 
@@ -227,11 +123,13 @@ describe('Tournament', function() {
 			fooPool.getCollisionScore.returns(0);
 			barPool.getCollisionScore.returns(0);
 			tournament.getCollisionScore();
-			tournament.getPools.resetHistory();
+			sandbox.resetHistory();
 
 			let result = tournament.getCollisionScore();
 
 			expect(tournament.getPools).to.not.be.called;
+			expect(fooPool.getCollisionScore).to.not.be.called;
+			expect(barPool.getCollisionScore).to.not.be.called;
 			expect(result).to.equal(0);
 		});
 	});
@@ -240,18 +138,15 @@ describe('Tournament', function() {
 		let tournament;
 
 		beforeEach(function() {
-			tournament = new Tournament();
+			tournament = new Tournament([], { targetCollisionScore: 1 });
 			sandbox.stub(tournament, 'getCollisionScore').returns(3);
-			sandbox.stub(tournament, 'getMinimumCollisionScore').returns(1);
 		});
 
-		it('returns inverse of difference between collision score and minimum', function() {
+		it('returns inverse of difference between collision score and target', function() {
 			let result = tournament.getFitnessScore();
 
 			expect(tournament.getCollisionScore).to.be.calledOnce;
 			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
-			expect(tournament.getMinimumCollisionScore).to.be.calledOnce;
-			expect(tournament.getMinimumCollisionScore).to.be.calledOn(tournament);
 			expect(result).to.equal(0.5);
 		});
 
@@ -262,20 +157,17 @@ describe('Tournament', function() {
 			let result = tournament.getFitnessScore();
 
 			expect(tournament.getCollisionScore).to.be.not.be.called;
-			expect(tournament.getMinimumCollisionScore).to.not.be.called;
 			expect(result).to.equal(0.5);
 		});
 
 		it('caches NaN result', function() {
 			tournament.getCollisionScore.returns(NaN);
-			tournament.getMinimumCollisionScore.returns(NaN);
 			tournament.getFitnessScore();
 			sandbox.resetHistory();
 
 			let result = tournament.getFitnessScore();
 
 			expect(tournament.getCollisionScore).to.be.not.be.called;
-			expect(tournament.getMinimumCollisionScore).to.not.be.called;
 			expect(result).to.be.NaN;
 		});
 	});
