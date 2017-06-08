@@ -1,6 +1,13 @@
 const utils = require('../../lib/utils');
+const shuffleArray = require('shuffle-array');
 
 describe('utils', function() {
+	describe('::shuffleArray', function() {
+		it('is shuffle-array module', function() {
+			expect(utils.shuffleArray).to.equal(shuffleArray);
+		});
+	});
+
 	describe('::getPoolIndex', function() {
 		it('returns pool index of seed based on pool count', function() {
 			// 2 pools
@@ -80,7 +87,7 @@ describe('utils', function() {
 		});
 	});
 
-	describe('getRankGroups', function() {
+	describe('::getRankGroups', function() {
 		it('divides and sorts players based on their ranks', function() {
 			let players = [
 				{ tag: 'a', rank: 1 },
