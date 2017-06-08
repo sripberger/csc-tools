@@ -42,20 +42,14 @@ describe('utils', function() {
 
 	describe('::getRegionCounts', function() {
 		it('returns map from regions to number of players in each', function() {
-			let players = [
+			expect(utils.getRegionCounts([
 				{ region: 'foo' },
 				{ region: 'bar' },
 				{ region: 'baz' },
 				{ region: 'bar' },
 				{ region: 'baz' },
 				{ region: 'baz' }
-			];
-
-			expect(utils.getRegionCounts(players)).to.deep.equal({
-				foo: 1,
-				bar: 2,
-				baz: 3
-			});
+			])).to.deep.equal({ foo: 1, bar: 2, baz: 3 });
 		});
 	});
 
@@ -83,6 +77,26 @@ describe('utils', function() {
 				foo: 5, // Should be ignored
 				bar: 6 // 2 single collisions
 			}, 4, 'foo')).to.equal(2);
+		});
+	});
+
+	describe('getRankGroups', function() {
+		it('divides and sorts players based on their ranks', function() {
+			let players = [
+				{ tag: 'a', rank: 1 },
+				{ tag: 'b', rank: 1 },
+				{ tag: 'c', rank: 2 },
+				{ tag: 'd', rank: 2 },
+				{ tag: 'e', rank: 1.5 },
+				{ tag: 'f', rank: 1.5 },
+				{ tag: 'g', rank: 1 }
+			];
+
+			expect(utils.getRankGroups(players)).to.deep.equal([
+				[ players[0], players[1], players[6] ],
+				[ players[4], players[5] ],
+				[ players[2], players[3] ],
+			]);
 		});
 	});
 });
