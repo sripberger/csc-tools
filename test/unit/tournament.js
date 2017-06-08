@@ -81,19 +81,14 @@ describe('Tournament', function() {
 	});
 
 	describe('#getCollisionScore', function() {
-		let tournament, fooPool, barPool;
-
-		beforeEach(function() {
-			tournament = new Tournament([], { ignoredRegion: 'baz' });
-			fooPool = new Pool([ { tag: 'foo' }]);
-			barPool = new Pool([ { tag: 'bar' }]);
-
+		it('returns sum of collision scores from all pools', function() {
+			let tournament = new Tournament([], { ignoredRegion: 'baz' });
+			let fooPool = new Pool([ { tag: 'foo' }]);
+			let barPool = new Pool([ { tag: 'bar' }]);
 			sandbox.stub(tournament, 'getPools').returns([ fooPool, barPool ]);
 			sandbox.stub(fooPool, 'getCollisionScore').returns(2);
 			sandbox.stub(barPool, 'getCollisionScore').returns(3);
-		});
 
-		it('returns sum of collision scores from all pools', function() {
 			let result = tournament.getCollisionScore();
 
 			expect(tournament.getPools).to.be.calledOnce;
@@ -105,32 +100,6 @@ describe('Tournament', function() {
 			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
 			expect(barPool.getCollisionScore).to.be.calledWith(tournament.ignoredRegion);
 			expect(result).to.equal(5);
-		});
-
-		it('caches nonzero result', function() {
-			tournament.getCollisionScore();
-			sandbox.resetHistory();
-
-			let result = tournament.getCollisionScore();
-
-			expect(tournament.getPools).to.not.be.called;
-			expect(fooPool.getCollisionScore).to.not.be.called;
-			expect(barPool.getCollisionScore).to.not.be.called;
-			expect(result).to.equal(5);
-		});
-
-		it('caches zero result', function() {
-			fooPool.getCollisionScore.returns(0);
-			barPool.getCollisionScore.returns(0);
-			tournament.getCollisionScore();
-			sandbox.resetHistory();
-
-			let result = tournament.getCollisionScore();
-
-			expect(tournament.getPools).to.not.be.called;
-			expect(fooPool.getCollisionScore).to.not.be.called;
-			expect(barPool.getCollisionScore).to.not.be.called;
-			expect(result).to.equal(0);
 		});
 	});
 
