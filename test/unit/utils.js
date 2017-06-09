@@ -197,4 +197,70 @@ describe('utils', function() {
 			]);
 		});
 	});
+
+	describe('::getMutationIndices', function() {
+		it('returns shuffled mutation indices based on provided length and rate', function() {
+			let length = 6;
+			let rate = 0.001;
+			sandbox.stub(_, 'random')
+				.onCall(0).returns(0.0009)
+				.onCall(1).returns(0.001)
+				.onCall(2).returns(0.0011)
+				.onCall(3).returns(0.00101)
+				.onCall(4).returns(0.00001)
+				.onCall(5).returns(0.002);
+			sandbox.stub(utils, 'shuffleArray').returnsArg(0);
+
+			let result = utils.getMutationIndices(length, rate);
+
+			expect(_.random).to.have.callCount(6);
+			expect(_.random).to.have.always.been.calledOn(_);
+			expect(_.random).to.have.always.been.calledWith(0, rate, true);
+			expect(utils.shuffleArray).to.be.calledOnce;
+			expect(utils.shuffleArray).to.be.calledOn(utils);
+			expect(utils.shuffleArray).to.be.calledWith([ 0, 4 ]);
+			expect(result).to.equal(utils.shuffleArray.firstCall.returnValue);
+		});
+	});
+
+	describe('::getMutations', function() {
+		it('pairs mutation indices with random partner indices', function() {
+			let length = 6;
+			let rate = 0.001;
+			sandbox.stub(utils, 'getMutationIndices').returns([ 0, 4 ]);
+			sandbox.stub(_, 'random')
+				.onFirstCall().returns(1)
+				.onSecondCall().returns(3);
+
+			let result = utils.getMutations(length, rate);
+
+			expect(utils.getMutationIndices).to.be.calledOnce;
+			expect(utils.getMutationIndices).to.be.calledOn(utils);
+			expect(utils.getMutationIndices).to.be.calledWith(length, rate);
+			expect(_.random).to.be.calledTwice;
+			expect(_.random).to.always.be.calledOn(_);
+			expect(_.random).to.always.be.calledWith(0, length - 1);
+			expect(result).to.deep.equal([ [ 0, 1 ], [ 4, 3 ] ]);
+		});
+	});
+
+	describe('::reciprocalExchange', function() {
+		it('returns a copy with mutations performed in order', function() {
+			let array = [ 'a', 'b', 'c', 'd', 'e' ];
+			let rate = 0.001;
+			sandbox.stub(utils, 'getMutations').returns([
+				[ 0, 1 ],
+				[ 2, 3 ],
+				[ 4, 3 ]
+			]);
+
+			let result = utils.reciprocalExchange(array, rate);
+
+			expect(utils.getMutations).to.be.calledOnce;
+			expect(utils.getMutations).to.be.calledOn(utils);
+			expect(utils.getMutations).to.be.calledWith(array.length, rate);
+			expect(result).to.deep.equal([ 'b', 'a', 'd', 'e', 'c' ]);
+			expect(array).to.deep.equal([ 'a', 'b', 'c', 'd', 'e' ]);
+		});
+	});
 });
