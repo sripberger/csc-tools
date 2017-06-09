@@ -179,4 +179,22 @@ describe('utils', function() {
 			expect(result).to.deep.equal([ start, end ]);
 		});
 	});
+
+	describe('::pmx', function() {
+		it('performs a partially-mapped crossover', function() {
+			let left = [ 1, 2, 3, 4, 5, 6, 7 ];
+			let right = [ 5, 4, 6, 7, 2, 1, 3 ];
+			sandbox.stub(utils, 'getCrossoverRange').returns([ 2, 6 ]);
+
+			let result = utils.pmx(left, right);
+
+			expect(utils.getCrossoverRange).to.be.calledOnce;
+			expect(utils.getCrossoverRange).to.be.calledOn(utils);
+			expect(utils.getCrossoverRange).to.be.calledWith(left.length);
+			expect(result).to.deep.equal([
+				[ 3, 5, 6, 7, 2, 1, 4 ],
+				[ 2, 7, 3, 4, 5, 6, 1 ]
+			]);
+		});
+	});
 });
