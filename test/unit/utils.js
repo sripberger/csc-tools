@@ -191,7 +191,7 @@ describe('utils', function() {
 		});
 	});
 
-	describe('::getMutations', function() {
+	describe('::getExchanges', function() {
 		it('pairs mutation indices with random partner indices', function() {
 			let length = 6;
 			let rate = 0.001;
@@ -200,7 +200,7 @@ describe('utils', function() {
 				.onFirstCall().returns(1)
 				.onSecondCall().returns(3);
 
-			let result = utils.getMutations(length, rate);
+			let result = utils.getExchanges(length, rate);
 
 			expect(utils.getMutationIndices).to.be.calledOnce;
 			expect(utils.getMutationIndices).to.be.calledOn(utils);
@@ -213,10 +213,10 @@ describe('utils', function() {
 	});
 
 	describe('::reciprocalExchange', function() {
-		it('returns a copy with mutations performed in order', function() {
+		it('returns a copy with random exchanges performed in order', function() {
 			let array = [ 'a', 'b', 'c', 'd', 'e' ];
 			let rate = 0.001;
-			sandbox.stub(utils, 'getMutations').returns([
+			sandbox.stub(utils, 'getExchanges').returns([
 				[ 0, 1 ],
 				[ 2, 3 ],
 				[ 4, 3 ]
@@ -224,9 +224,9 @@ describe('utils', function() {
 
 			let result = utils.reciprocalExchange(array, rate);
 
-			expect(utils.getMutations).to.be.calledOnce;
-			expect(utils.getMutations).to.be.calledOn(utils);
-			expect(utils.getMutations).to.be.calledWith(array.length, rate);
+			expect(utils.getExchanges).to.be.calledOnce;
+			expect(utils.getExchanges).to.be.calledOn(utils);
+			expect(utils.getExchanges).to.be.calledWith(array.length, rate);
 			expect(result).to.deep.equal([ 'b', 'a', 'd', 'e', 'c' ]);
 			expect(array).to.deep.equal([ 'a', 'b', 'c', 'd', 'e' ]);
 		});
