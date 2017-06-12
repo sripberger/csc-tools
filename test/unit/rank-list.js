@@ -43,4 +43,28 @@ describe('RankList', function() {
 			]);
 		});
 	});
+
+	describe('#mutate', function() {
+		it('', function() {
+			let fooRank = new Rank([ { tag: 'foo' } ]);
+			let barRank = new Rank([ { tag: 'bar' } ]);
+			let bazRank = new Rank([ { tag: 'baz' } ]);
+			let quxRank = new Rank([ { tag: 'qux' } ]);
+			let rankList = new RankList([ fooRank, barRank ]);
+			let rate = 0.001;
+			sinon.stub(fooRank, 'mutate').returns(bazRank);
+			sinon.stub(barRank, 'mutate').returns(quxRank);
+
+			let result = rankList.mutate(rate);
+
+			expect(fooRank.mutate).to.be.calledOnce;
+			expect(fooRank.mutate).to.be.calledOn(fooRank);
+			expect(fooRank.mutate).to.be.calledWith(rate);
+			expect(barRank.mutate).to.be.calledOnce;
+			expect(barRank.mutate).to.be.calledOn(barRank);
+			expect(barRank.mutate).to.be.calledWith(rate);
+			expect(result).to.be.an.instanceof(RankList);
+			expect(result.ranks).to.deep.equal([ bazRank, quxRank ]);
+		});
+	});
 });
