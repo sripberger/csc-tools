@@ -119,64 +119,32 @@ describe('utils', function() {
 		});
 	});
 
-	describe('::getCrossoverStart', function() {
-		it('returns a random integer between 0 and last index', function() {
-			let length = 10;
-			sandbox.stub(_, 'random').returns(7);
-
-			let result = utils.getCrossoverStart(length);
-
-			expect(_.random).to.be.calledOnce;
-			expect(_.random).to.be.calledOn(_);
-			expect(_.random).to.be.calledWith(0, length - 1);
-			expect(result).to.equal(7);
-		});
-	});
-
-	describe('::getCrossoverEnd', function() {
+	describe('::getCrossoverRange', function() {
 		const length = 10;
 
-		it('returns a random index after start', function() {
-			let start = 3;
-			sandbox.stub(_, 'random').returns(7);
-
-			let result = utils.getCrossoverEnd(start, length);
-
-			expect(_.random).to.be.calledOnce;
-			expect(_.random).to.be.calledOn(_);
-			expect(_.random).to.be.calledWith(start + 1, length);
-			expect(result).to.equal(7);
+		beforeEach(function() {
+			sandbox.stub(_, 'random');
 		});
 
-		it('returns a random index between 1 and last index if start is 0', function() {
-			sandbox.stub(_, 'random').returns(8);
-
-			let result = utils.getCrossoverEnd(0, length);
-
-			expect(_.random).to.be.calledOnce;
-			expect(_.random).to.be.calledOn(_);
-			expect(_.random).to.be.calledWith(1, length - 1);
-			expect(result).to.equal(8);
-		});
-	});
-
-	describe('::getCrossoverRange', function() {
-		it('returns crossover start and end as a two-element array', function() {
-			let length = 10;
-			let start = 3;
-			let end = 7;
-			sandbox.stub(utils, 'getCrossoverStart').returns(start);
-			sandbox.stub(utils, 'getCrossoverEnd').returns(end);
+		it('returns two random indices between 0 and length', function() {
+			_.random
+				.onFirstCall().returns(3)
+				.onSecondCall().returns(7);
 
 			let result = utils.getCrossoverRange(length);
 
-			expect(utils.getCrossoverStart).to.be.calledOnce;
-			expect(utils.getCrossoverStart).to.be.calledOn(utils);
-			expect(utils.getCrossoverStart).to.be.calledWith(length);
-			expect(utils.getCrossoverEnd).to.be.calledOnce;
-			expect(utils.getCrossoverEnd).to.be.calledOn(utils);
-			expect(utils.getCrossoverEnd).to.be.calledWith(start, length);
-			expect(result).to.deep.equal([ start, end ]);
+			expect(_.random).to.be.calledTwice;
+			expect(_.random).to.always.be.calledOn(_);
+			expect(_.random).to.always.be.calledWithExactly(0, length);
+			expect(result).to.deep.equal([ 3, 7 ]);
+		});
+
+		it('returns smaller of to results first', function() {
+			_.random
+				.onFirstCall().returns(7)
+				.onSecondCall().returns(3);
+
+			expect(utils.getCrossoverRange(length)).to.deep.equal([ 3, 7 ]);
 		});
 	});
 
