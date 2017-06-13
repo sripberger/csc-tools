@@ -1,8 +1,19 @@
 const RankList = require('../../lib/rank-list');
 const sinon = require('sinon');
 const Rank = require('../../lib/rank');
+const _ = require('lodash');
 
 describe('RankList', function() {
+	let sandbox;
+
+	beforeEach(function() {
+		sandbox = sinon.sandbox.create();
+	});
+
+	afterEach(function() {
+		sandbox.restore();
+	});
+
 	it('stores provided ranks array', function() {
 		let ranks = [
 			new Rank([ { tag: 'foo' } ]),
@@ -44,8 +55,60 @@ describe('RankList', function() {
 		});
 	});
 
+	describe('#crossover', function() {
+		it('returns offpring based on crossover rate', function() {
+			let fooRanks = [];
+			let barRanks = [];
+			let crossoverRanks = [];
+			let sampleRanks = [];
+			_.times(4 ,(index) => {
+				let fooRank = new Rank([ { tag: 'bar', index } ]);
+				let crossoverRank = new Rank([ { tag: 'crossover', index } ]);
+				sinon.stub(fooRank, 'crossover').returns(crossoverRank);
+				fooRanks.push(fooRank);
+				crossoverRanks.push(crossoverRank);
+				barRanks.push(new Rank([ { tag: 'bar', index } ]));
+				sampleRanks.push(new Rank([ { tag: 'sample', index } ]));
+			});
+			let fooList = new RankList(fooRanks);
+			let barList = new RankList(barRanks);
+			let rate = 0.7;
+			sandbox.stub(_, 'random')
+				.onCall(0).returns(0.69)
+				.onCall(1).returns(0.7)
+				.onCall(2).returns(0.1)
+				.onCall(3).returns(0.71);
+			sandbox.stub(_, 'sample')
+				.withArgs([ fooRanks[1], barRanks[1] ]).returns(sampleRanks[1])
+				.withArgs([ fooRanks[3], barRanks[3] ]).returns(sampleRanks[3]);
+
+			let result = fooList.crossover(barList, rate);
+
+			expect(_.random).to.have.callCount(4);
+			expect(_.random).to.always.be.calledOn(_);
+			expect(_.random).to.always.be.calledWith(0, 1, true);
+			expect(fooRanks[0].crossover).to.be.calledOnce;
+			expect(fooRanks[0].crossover).to.be.calledOn(fooRanks[0]);
+			expect(fooRanks[0].crossover).to.be.calledWith(barRanks[0]);
+			expect(fooRanks[2].crossover).to.be.calledWith(barRanks[2]);
+			expect(fooRanks[2].crossover).to.be.calledWith(barRanks[2]);
+			expect(fooRanks[2].crossover).to.be.calledWith(barRanks[2]);
+			expect(_.sample).to.be.calledTwice;
+			expect(_.sample).to.always.be.calledOn(_);
+			expect(_.sample).to.be.calledWith([ fooRanks[1], barRanks[1] ]);
+			expect(_.sample).to.be.calledWith([ fooRanks[3], barRanks[3] ]);
+			expect(result).to.be.an.instanceOf(RankList);
+			expect(result.ranks).to.deep.equal([
+				crossoverRanks[0],
+				sampleRanks[1],
+				crossoverRanks[2],
+				sampleRanks[3]
+			]);
+		});
+	});
+
 	describe('#mutate', function() {
-		it('', function() {
+		it('returns a mutated copy', function() {
 			let fooRank = new Rank([ { tag: 'foo' } ]);
 			let barRank = new Rank([ { tag: 'bar' } ]);
 			let bazRank = new Rank([ { tag: 'baz' } ]);
