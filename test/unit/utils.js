@@ -183,7 +183,7 @@ describe('utils', function() {
 
 			expect(_.random).to.have.callCount(6);
 			expect(_.random).to.have.always.been.calledOn(_);
-			expect(_.random).to.have.always.been.calledWith(0, rate, true);
+			expect(_.random).to.have.always.been.calledWith(0, 1, true);
 			expect(utils.shuffleArray).to.be.calledOnce;
 			expect(utils.shuffleArray).to.be.calledOn(utils);
 			expect(utils.shuffleArray).to.be.calledWith([ 0, 4 ]);
