@@ -2,6 +2,7 @@ const TournamentGenerator = require('../../lib/tournament-generator');
 const sinon = require('sinon');
 const RankList = require('../../lib/rank-list');
 const utils = require('../../lib/utils');
+const Tournament = require('../../lib/tournament');
 
 describe('TournamentGenerator', function() {
 	let sandbox;
@@ -175,6 +176,34 @@ describe('TournamentGenerator', function() {
 			expect(generator.getIgnoredRegion).to.not.be.called;
 			expect(utils.getMinimumCollisionScore).to.not.be.called;
 			expect(result).to.equal(0);
+		});
+	});
+
+	describe('#generateTournament', function() {
+		it('returns a Tournament with shuffled rank list and copied settings', function() {
+			let rankList = new RankList();
+			let poolCount = 4;
+			let generator = new TournamentGenerator(rankList, poolCount);
+			let ignoredRegion = 'ignored region';
+			let minimumCollisionScore = 42;
+			let shuffledList = new RankList();
+			sandbox.stub(generator, 'getIgnoredRegion').returns(ignoredRegion);
+			sandbox.stub(generator, 'getMinimumCollisionScore').returns(minimumCollisionScore);
+			sandbox.stub(rankList, 'shuffle').returns(shuffledList);
+
+			let result = generator.generateTournament();
+
+			expect(generator.getIgnoredRegion).to.be.calledOnce;
+			expect(generator.getIgnoredRegion).to.be.calledOn(generator);
+			expect(generator.getMinimumCollisionScore).to.be.calledOnce;
+			expect(generator.getMinimumCollisionScore).to.be.calledOn(generator);
+			expect(rankList.shuffle).to.be.calledOnce;
+			expect(rankList.shuffle).to.be.calledOn(rankList);
+			expect(result).to.be.an.instanceof(Tournament);
+			expect(result.poolCount).to.equal(poolCount);
+			expect(result.rankList).to.equal(shuffledList);
+			expect(result.ignoredRegion).to.equal(ignoredRegion);
+			expect(result.targetCollisionScore).to.equal(minimumCollisionScore);
 		});
 	});
 });
