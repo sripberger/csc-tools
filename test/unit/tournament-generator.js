@@ -1,5 +1,6 @@
 const TournamentGenerator = require('../../lib/tournament-generator');
 const sinon = require('sinon');
+const RankList = require('../../lib/rank-list');
 const utils = require('../../lib/utils');
 
 describe('TournamentGenerator', function() {
@@ -13,43 +14,71 @@ describe('TournamentGenerator', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided player array and pool count', function() {
-		let players = [
-			{ tag: 'foo' },
-			{ tag: 'bar' }
-		];
+	it('stores provided rank list and pool count', function() {
+		let rankList = new RankList();
 		let poolCount = 4;
 
-		let generator = new TournamentGenerator(players, poolCount);
+		let generator = new TournamentGenerator(rankList, poolCount);
 
-		expect(generator.players).to.equal(players);
+		expect(generator.rankList).to.equal(rankList);
 		expect(generator.poolCount).to.equal(poolCount);
 	});
 
-	it('defaults to empty player array with a pool count of 1', function() {
+	it('defaults to empty rank list with a pool count of 1', function() {
 		let generator = new TournamentGenerator();
 
-		expect(generator.players).to.deep.equal([]);
+		expect(generator.rankList).to.be.an.instanceof(RankList);
+		expect(generator.rankList.ranks).to.deep.equal([]);
 		expect(generator.poolCount).to.equal(1);
 	});
 
+	describe('::create', function() {
+		it('returns a TournamentGenerator with rank list created from provided player array', function() {
+			let players = [
+				{ tag: 'foo' },
+				{ tag: 'bar' }
+			];
+			let poolCount = 2;
+			let rankList = new RankList(players);
+			sandbox.stub(RankList, 'create').returns(rankList);
+
+			let result = TournamentGenerator.create(players, 2);
+
+			expect(RankList.create).to.be.calledOnce;
+			expect(RankList.create).to.be.calledOn(RankList);
+			expect(RankList.create).to.be.calledWith(players);
+			expect(result).to.be.an.instanceof(TournamentGenerator);
+			expect(result.rankList).to.equal(rankList);
+			expect(result.poolCount).to.equal(poolCount);
+		});
+	});
+
 	describe('#getRegionCounts', function() {
-		let generator;
+		let generator, rankList;
 
 		beforeEach(function() {
-			generator = new TournamentGenerator([
-				{ tag: 'dude' },
-				{ tag: 'bro' }
-			]);
+			generator = new TournamentGenerator();
+			({ rankList } = generator);
+			sandbox.stub(rankList, 'seedOrder').returns({
+				[Symbol.iterator]: function*() {
+					yield { tag: 'dude' };
+					yield { tag: 'bro' };
+				}
+			});
 			sandbox.stub(utils, 'getRegionCounts').returns({ foo: 1, bar: 2 });
 		});
 
 		it('returns region counts using utils::getRegionCounts', function() {
 			let result = generator.getRegionCounts();
 
+			expect(rankList.seedOrder).to.be.calledOnce;
+			expect(rankList.seedOrder).to.be.calledOn(rankList);
 			expect(utils.getRegionCounts).to.be.calledOnce;
 			expect(utils.getRegionCounts).to.be.calledOn(utils);
-			expect(utils.getRegionCounts).to.be.calledWith(generator.players);
+			expect(utils.getRegionCounts).to.be.calledWith([
+				{ tag: 'dude' },
+				{ tag: 'bro' }
+			]);
 			expect(result).to.deep.equal({ foo: 1, bar: 2 });
 		});
 
@@ -59,6 +88,7 @@ describe('TournamentGenerator', function() {
 
 			let result = generator.getRegionCounts();
 
+			expect(rankList.seedOrder).to.not.be.called;
 			expect(utils.getRegionCounts).to.not.be.called;
 			expect(result).to.deep.equal({ foo: 1, bar: 2 });
 		});
@@ -99,7 +129,7 @@ describe('TournamentGenerator', function() {
 		let generator;
 
 		beforeEach(function() {
-			generator = new TournamentGenerator([], 4);
+			generator = new TournamentGenerator(new RankList(), 4);
 			sandbox.stub(generator, 'getRegionCounts').returns({ foo: 1, bar: 2 });
 			sandbox.stub(generator, 'getIgnoredRegion').returns('baz');
 			sandbox.stub(utils, 'getMinimumCollisionScore').returns(42);
