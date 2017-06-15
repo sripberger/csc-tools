@@ -67,6 +67,26 @@ describe('RankList', function() {
 		});
 	});
 
+	describe('#seedOrder', function() {
+		it('returns an iterable that yields players in seed order', function() {
+			let foo = { tag: 'foo' };
+			let bar = { tag: 'bar' };
+			let baz = { tag: 'baz' };
+			let qux = { tag: 'qux' };
+			let rankList = new RankList([
+				new Rank([ foo, bar ]),
+				new Rank([ baz, qux ])
+			]);
+
+			expect([...rankList.seedOrder()]).to.deep.equal([
+				foo,
+				bar,
+				baz,
+				qux
+			]);
+		});
+	});
+
 	describe('#shuffle', function() {
 		it('returns copy with each rank shuffled', function() {
 			let fooRank = new Rank([ { tag: 'foo' }, { tag: 'baz' } ]);
