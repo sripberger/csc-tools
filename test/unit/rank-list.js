@@ -31,6 +31,42 @@ describe('RankList', function() {
 		expect(rankList.ranks).to.deep.equal([]);
 	});
 
+	describe('::create', function() {
+		it('returns a RankList populated with provided player list', function() {
+			let players = [
+				{ tag: 'a', rank: 1 },
+				{ tag: 'b', rank: 1 },
+				{ tag: 'c', rank: 2 },
+				{ tag: 'd', rank: 2 },
+				{ tag: 'e', rank: 1.5 },
+				{ tag: 'f', rank: 1.5 },
+				{ tag: 'g', rank: 1 }
+			];
+
+			let result = RankList.create(players);
+
+			expect(result).to.be.an.instanceof(RankList);
+			expect(result.ranks).to.be.an.instanceof(Array);
+			expect(result.ranks).to.have.length(3);
+			expect(result.ranks[0]).to.be.an.instanceof(Rank);
+			expect(result.ranks[0].players).to.deep.equal([
+				players[0],
+				players[1],
+				players[6]
+			]);
+			expect(result.ranks[1]).to.be.an.instanceof(Rank);
+			expect(result.ranks[1].players).to.deep.equal([
+				players[4],
+				players[5]
+			]);
+			expect(result.ranks[2]).to.be.an.instanceof(Rank);
+			expect(result.ranks[2].players).to.deep.equal([
+				players[2],
+				players[3]
+			]);
+		});
+	});
+
 	describe('#shuffle', function() {
 		it('returns copy with each rank shuffled', function() {
 			let fooRank = new Rank([ { tag: 'foo' }, { tag: 'baz' } ]);

@@ -99,26 +99,6 @@ describe('utils', function() {
 		});
 	});
 
-	describe('::getRankGroups', function() {
-		it('divides and sorts players based on their ranks', function() {
-			let players = [
-				{ tag: 'a', rank: 1 },
-				{ tag: 'b', rank: 1 },
-				{ tag: 'c', rank: 2 },
-				{ tag: 'd', rank: 2 },
-				{ tag: 'e', rank: 1.5 },
-				{ tag: 'f', rank: 1.5 },
-				{ tag: 'g', rank: 1 }
-			];
-
-			expect(utils.getRankGroups(players)).to.deep.equal([
-				[ players[0], players[1], players[6] ],
-				[ players[4], players[5] ],
-				[ players[2], players[3] ],
-			]);
-		});
-	});
-
 	describe('::getCrossoverRange', function() {
 		const length = 10;
 
