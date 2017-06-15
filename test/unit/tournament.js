@@ -1,5 +1,6 @@
 const Tournament = require('../../lib/tournament');
 const sinon = require('sinon');
+const RankList = require('../../lib/rank-list');
 const utils = require('../../lib/utils');
 const Pool = require('../../lib/pool');
 
@@ -14,29 +15,27 @@ describe('Tournament', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided player array and settings', function() {
-		let players = [
-			{ tag: 'foo' },
-			{ tag: 'bar' }
-		];
+	it('stores provided rank list and settings', function() {
+		let rankList = new RankList();
 		let settings = {
 			poolCount: 4,
 			ignoredRegion: 'ignored region',
 			targetCollisionScore: 42,
 		};
 
-		let tournament = new Tournament(players, settings);
+		let tournament = new Tournament(rankList, settings);
 
-		expect(tournament.players).to.equal(players);
+		expect(tournament.rankList).to.equal(rankList);
 		expect(tournament.poolCount).to.equal(settings.poolCount);
 		expect(tournament.ignoredRegion).to.equal(settings.ignoredRegion);
 		expect(tournament.targetCollisionScore).to.equal(settings.targetCollisionScore);
 	});
 
-	it('defaults to empty player array with default settings', function() {
+	it('defaults to empty rank list and default settings', function() {
 		let tournament = new Tournament();
 
-		expect(tournament.players).to.deep.equal([]);
+		expect(tournament.rankList).to.be.an.instanceof(RankList);
+		expect(tournament.rankList.ranks).to.deep.equal([]);
 		expect(tournament.poolCount).to.equal(1);
 		expect(tournament.ignoredRegion).to.be.null;
 		expect(tournament.targetCollisionScore).to.equal(0);
@@ -44,14 +43,17 @@ describe('Tournament', function() {
 
 	describe('#getPools', function() {
 		it('arranges players into pools using utils::getPoolIndex', function() {
-			let players = [
-				{ tag: 'foo' },
-				{ tag: 'bar' },
-				{ tag: 'baz' },
-				{ tag: 'qux'}
-			];
+			let rankList = new RankList();
 			let poolCount = 4;
-			let tournament = new Tournament(players, { poolCount });
+			let tournament = new Tournament(rankList, { poolCount });
+			sandbox.stub(rankList, 'seedOrder').returns({
+				[Symbol.iterator]: function*() {
+					yield { tag: 'foo' };
+					yield { tag: 'bar' };
+					yield { tag: 'baz' };
+					yield { tag: 'qux' };
+				}
+			});
 			sandbox.stub(utils, 'getPoolIndex')
 				.withArgs(0, poolCount).returns(0)
 				.withArgs(1, poolCount).returns(1)
@@ -61,6 +63,8 @@ describe('Tournament', function() {
 
 			let result = tournament.getPools();
 
+			expect(rankList.seedOrder).to.be.calledOnce;
+			expect(rankList.seedOrder).to.be.calledOn(rankList);
 			expect(utils.getPoolIndex).to.have.callCount(4);
 			expect(utils.getPoolIndex).to.always.be.calledOn(utils);
 			expect(utils.getPoolIndex).to.be.calledWith(0, poolCount);
@@ -70,11 +74,11 @@ describe('Tournament', function() {
 			expect(result).to.be.an.instanceof(Array);
 			expect(result).to.have.length(poolCount);
 			expect(result[0]).to.be.an.instanceof(Pool);
-			expect(result[0].players).to.deep.equal([ players[0] ]);
+			expect(result[0].players).to.deep.equal([ { tag: 'foo' } ]);
 			expect(result[1]).to.be.an.instanceof(Pool);
-			expect(result[1].players).to.deep.equal([ players[1] ]);
+			expect(result[1].players).to.deep.equal([ { tag: 'bar' } ]);
 			expect(result[2]).to.be.an.instanceof(Pool);
-			expect(result[2].players).to.deep.equal([ players[2], players[3] ]);
+			expect(result[2].players).to.deep.equal([ { tag: 'baz' }, { tag: 'qux' } ]);
 			expect(result[3]).to.be.an.instanceof(Pool);
 			expect(result[3].players).to.deep.equal([]);
 		});
