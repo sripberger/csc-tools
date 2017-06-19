@@ -20,6 +20,20 @@ describe('utils', function() {
 		});
 	});
 
+	describe('::pickFromArray', function() {
+		it('returns result of shuffle-array pick method with provided count', function() {
+			let array = [ 'foo', 'bar', 'baz' ];
+			sandbox.stub(shuffleArray, 'pick').returns([ 'foo', 'baz' ]);
+
+			let result = utils.pickFromArray(array, 2);
+
+			expect(shuffleArray.pick).to.be.calledOnce;
+			expect(shuffleArray.pick).to.be.calledOn(shuffleArray);
+			expect(shuffleArray.pick).to.be.calledWith(array, { picks: 2 });
+			expect(result).to.deep.equal([ 'foo', 'baz' ]);
+		});
+	});
+
 	describe('::getPoolIndex', function() {
 		it('returns pool index of seed based on pool count', function() {
 			// 2 pools
