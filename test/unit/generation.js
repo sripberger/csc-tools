@@ -33,41 +33,62 @@ describe('Generation', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided array of individuals', function() {
+	it('stores provided individual array and settings object', function() {
 		let individuals = [ new Individual('foo'), new Individual('bar') ];
+		let settings = { foo: 'bar' };
 
-		let generation = new Generation(individuals);
+		let generation = new Generation(individuals, settings);
 
 		expect(generation.individuals).to.equal(individuals);
+		expect(generation.settings).to.equal(settings);
 	});
 
-	it('defaults to an empty array of individuals', function() {
+	it('defaults to an empty individual array and settings object', function() {
 		let generation = new Generation();
 
 		expect(generation.individuals).to.deep.equal([]);
+		expect(generation.settings).to.deep.equal({});
 	});
 
 	describe('#getSample', function() {
-		it('returns a random subset of provided size', function() {
+		let generation, sample;
+
+		beforeEach(function() {
 			let foo = new Individual('foo');
 			let bar = new Individual('bar');
 			let baz = new Individual('baz');
-			let generation = new Generation([ foo, bar, baz ]);
-			let size = 2;
-			let sample = [ foo, bar ];
-			sandbox.stub(_, 'sampleSize').returns(sample);
 
-			let result = generation.getSample(size);
+			generation = new Generation([ foo, bar, baz ]);
+			sample = [ foo, bar ];
+
+			sandbox.stub(_, 'sampleSize').returns(sample);
+		});
+
+		it('returns a random subset of settings.sampleSize', function() {
+			generation.settings.sampleSize = 1;
+
+			let result = generation.getSample();
 
 			expect(_.sampleSize).to.be.calledOnce;
 			expect(_.sampleSize).to.be.calledOn(_);
-			expect(_.sampleSize).to.be.calledWith(generation.individuals, size);
+			expect(_.sampleSize).to.be.calledWith(
+				generation.individuals,
+				generation.settings.sampleSize
+			);
+			expect(result).to.equal(sample);
+		});
+
+		it('defaults to sample size of 2', function() {
+			let result = generation.getSample();
+
+			expect(_.sampleSize).to.be.calledOnce;
+			expect(_.sampleSize).to.be.calledOn(_);
+			expect(_.sampleSize).to.be.calledWith(generation.individuals, 2);
 			expect(result).to.equal(sample);
 		});
 	});
 
 	describe('#select', function() {
-		const sampleSize = 3;
 		let generation;
 
 		beforeEach(function() {
@@ -75,7 +96,7 @@ describe('Generation', function() {
 			sandbox.stub(generation, 'getSample');
 		});
 
-		it('returns highest-scoring individual from a sample of provided size', function() {
+		it('returns highest-scoring individual from a random sample', function() {
 			let foo = new Individual('foo');
 			let bar = new Individual('bar');
 			let baz = new Individual('baz');
@@ -84,10 +105,10 @@ describe('Generation', function() {
 			sandbox.stub(baz, 'getFitnessScore').returns(9);
 			generation.getSample.returns([ foo, bar, baz ]);
 
-			let result = generation.select(sampleSize);
+			let result = generation.select();
 
 			expect(generation.getSample).to.be.calledOnce;
-			expect(generation.getSample).to.be.calledWith(sampleSize);
+			expect(generation.getSample).to.be.calledOn(generation);
 			expect(foo.getFitnessScore).to.be.called;
 			expect(foo.getFitnessScore).to.always.be.calledOn(foo);
 			expect(bar.getFitnessScore).to.be.called;
@@ -100,78 +121,112 @@ describe('Generation', function() {
 		it('returns null if generation is empty', function() {
 			generation.getSample.returns([]);
 
-			expect(generation.select(sampleSize)).to.be.null;
+			expect(generation.select()).to.be.null;
 		});
 	});
 
-	describe('#getOffspring', function() {
-		const sampleSize = 3;
-		const crossoverRate = 0.7;
-		const mutationRate = 0.1;
-		let generation, foo, bar, fooBar, barFoo, fooBarPrime, barFooPrime;
+	describe('#getUnmutatedOffspring', function() {
+		let settings, generation, foo, bar, fooBar, barFoo;
 
 		beforeEach(function() {
-			generation = new Generation();
+			settings = { crossoverRate: 0.7 };
+			generation = new Generation([], settings);
 			foo = new Individual('foo');
 			bar = new Individual('bar');
 			fooBar = new Individual('foo-bar');
 			barFoo = new Individual('bar-foo');
-			fooBarPrime = new Individual('foo-bar-prime');
-			barFooPrime = new Individual('bar-foo-prime');
 
 			sandbox.stub(generation, 'select')
 				.onFirstCall().returns(foo)
 				.onSecondCall().returns(bar);
 
-			sandbox.stub(foo, 'crossover');
-
-			sandbox.stub(fooBar, 'mutate').returns(fooBarPrime);
-			sandbox.stub(barFoo, 'mutate').returns(barFooPrime);
+			sandbox.stub(foo, 'crossover').returns([ fooBar, barFoo ]);
 		});
 
 		it('creates offspring from two selected mates', function() {
-			foo.crossover.returns([ fooBar, barFoo ]);
-
-			let result = generation.getOffspring({
-				sampleSize,
-				crossoverRate,
-				mutationRate
-			});
+			let result = generation.getUnmutatedOffspring();
 
 			expect(generation.select).to.be.calledTwice;
 			expect(generation.select).to.always.be.calledOn(generation);
-			expect(generation.select).to.always.be.calledWith(sampleSize);
 			expect(foo.crossover).to.be.calledOnce;
 			expect(foo.crossover).to.be.calledOn(foo);
-			expect(foo.crossover).to.be.calledWith(bar, crossoverRate);
-			expect(fooBar.mutate).to.be.calledOnce;
-			expect(fooBar.mutate).to.be.calledOn(fooBar);
-			expect(fooBar.mutate).to.be.calledWith(mutationRate);
-			expect(barFoo.mutate).to.be.calledOnce;
-			expect(barFoo.mutate).to.be.calledOn(barFoo);
-			expect(barFoo.mutate).to.be.calledWith(mutationRate);
-			expect(result).to.deep.equal([ fooBarPrime, barFooPrime ]);
+			expect(foo.crossover).to.be.calledWith(bar, settings.crossoverRate);
+			expect(result).to.deep.equal([ fooBar, barFoo ]);
 		});
 
-		it('supports crossovers that return a single child', function() {
-			foo.crossover.returns(fooBar);
+		it('uses default crossover rate of 0', function() {
+			delete settings.crossoverRate;
 
-			let result = generation.getOffspring({
-				sampleSize,
-				crossoverRate,
-				mutationRate
-			});
+			let result = generation.getUnmutatedOffspring();
 
 			expect(generation.select).to.be.calledTwice;
 			expect(generation.select).to.always.be.calledOn(generation);
-			expect(generation.select).to.always.be.calledWith(sampleSize);
 			expect(foo.crossover).to.be.calledOnce;
 			expect(foo.crossover).to.be.calledOn(foo);
-			expect(foo.crossover).to.be.calledWith(bar, crossoverRate);
-			expect(fooBar.mutate).to.be.calledOnce;
-			expect(fooBar.mutate).to.be.calledOn(fooBar);
-			expect(fooBar.mutate).to.be.calledWith(mutationRate);
-			expect(result).to.deep.equal([ fooBarPrime ]);
+			expect(foo.crossover).to.be.calledWith(bar, 0);
+			expect(result).to.deep.equal([ fooBar, barFoo ]);
+		});
+
+		it('returns single offspring in an array', function() {
+			foo.crossover.returns(fooBar);
+
+			let result = generation.getUnmutatedOffspring();
+
+			expect(generation.select).to.be.calledTwice;
+			expect(generation.select).to.always.be.calledOn(generation);
+			expect(foo.crossover).to.be.calledOnce;
+			expect(foo.crossover).to.be.calledOn(foo);
+			expect(foo.crossover).to.be.calledWith(bar, settings.crossoverRate);
+			expect(result).to.deep.equal([ fooBar ]);
+		});
+	});
+
+	describe('#getOffspring', function() {
+		let settings, generation, foo, bar, fooPrime, barPrime;
+
+		beforeEach(function() {
+			settings = { mutationRate: 0.1 };
+			generation = new Generation([], settings);
+			foo = new Individual('foo');
+			bar = new Individual('bar');
+			fooPrime = new Individual('foo-prime');
+			barPrime = new Individual('bar-prime');
+
+			sandbox.stub(generation, 'getUnmutatedOffspring')
+				.returns([ foo, bar ]);
+
+			sandbox.stub(foo, 'mutate').returns(fooPrime);
+			sandbox.stub(bar, 'mutate').returns(barPrime);
+		});
+
+		it('returns mutated offspring', function() {
+			let result = generation.getOffspring();
+
+			expect(generation.getUnmutatedOffspring).to.be.calledOnce;
+			expect(generation.getUnmutatedOffspring).to.be.calledOn(generation);
+			expect(foo.mutate).to.be.calledOnce;
+			expect(foo.mutate).to.be.calledOn(foo);
+			expect(foo.mutate).to.be.calledWith(settings.mutationRate);
+			expect(bar.mutate).to.be.calledOnce;
+			expect(bar.mutate).to.be.calledOn(bar);
+			expect(bar.mutate).to.be.calledWith(settings.mutationRate);
+			expect(result).to.deep.equal([ fooPrime, barPrime ]);
+		});
+
+		it('uses default mutation rate of 0', function() {
+			delete settings.mutationRate;
+
+			let result = generation.getOffspring();
+
+			expect(generation.getUnmutatedOffspring).to.be.calledOnce;
+			expect(generation.getUnmutatedOffspring).to.be.calledOn(generation);
+			expect(foo.mutate).to.be.calledOnce;
+			expect(foo.mutate).to.be.calledOn(foo);
+			expect(foo.mutate).to.be.calledWith(0);
+			expect(bar.mutate).to.be.calledOnce;
+			expect(bar.mutate).to.be.calledOn(bar);
+			expect(bar.mutate).to.be.calledWith(0);
+			expect(result).to.deep.equal([ fooPrime, barPrime ]);
 		});
 	});
 });
