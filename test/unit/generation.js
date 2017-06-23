@@ -50,6 +50,29 @@ describe('Generation', function() {
 		expect(generation.settings).to.deep.equal({});
 	});
 
+	describe('#add', function() {
+		let foo, bar, baz, generation;
+
+		beforeEach(function() {
+			foo = new Individual('foo');
+			bar = new Individual('bar');
+			baz = new Individual('baz');
+			generation = new Generation([ foo ]);
+		});
+
+		it('pushes provided individual onto individuals array', function() {
+			generation.add(bar);
+
+			expect(generation.individuals).to.deep.equal([ foo, bar ]);
+		});
+
+		it('supports multiple arguments', function() {
+			generation.add(bar, baz);
+
+			expect(generation.individuals).to.deep.equal([ foo, bar, baz ]);
+		});
+	});
+
 	describe('#getSample', function() {
 		let generation, sample;
 
