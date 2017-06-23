@@ -33,31 +33,31 @@ describe('Generation', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided individual array and settings object', function() {
-		let individuals = [ new Individual('foo'), new Individual('bar') ];
+	it('stores provided settings object and a new individuals array', function() {
 		let settings = { foo: 'bar' };
 
-		let generation = new Generation(individuals, settings);
+		let generation = new Generation(settings);
 
-		expect(generation.individuals).to.equal(individuals);
 		expect(generation.settings).to.equal(settings);
+		expect(generation.individuals).to.deep.equal([]);
 	});
 
-	it('defaults to an empty individual array and settings object', function() {
+	it('defaults to an empty settings object', function() {
 		let generation = new Generation();
 
-		expect(generation.individuals).to.deep.equal([]);
 		expect(generation.settings).to.deep.equal({});
+		expect(generation.individuals).to.deep.equal([]);
 	});
 
 	describe('#add', function() {
-		let foo, bar, baz, generation;
+		let generation, foo, bar, baz;
 
 		beforeEach(function() {
+			generation = new Generation();
 			foo = new Individual('foo');
 			bar = new Individual('bar');
 			baz = new Individual('baz');
-			generation = new Generation([ foo ]);
+			generation.add(foo);
 		});
 
 		it('pushes provided individual onto individuals array', function() {
@@ -81,9 +81,10 @@ describe('Generation', function() {
 			let bar = new Individual('bar');
 			let baz = new Individual('baz');
 
-			generation = new Generation([ foo, bar, baz ]);
+			generation = new Generation();
 			sample = [ foo, bar ];
 
+			generation.add(foo, bar, baz );
 			sandbox.stub(_, 'sampleSize').returns(sample);
 		});
 
@@ -153,7 +154,7 @@ describe('Generation', function() {
 
 		beforeEach(function() {
 			settings = { crossoverRate: 0.7 };
-			generation = new Generation([], settings);
+			generation = new Generation(settings);
 			foo = new Individual('foo');
 			bar = new Individual('bar');
 			fooBar = new Individual('foo-bar');
@@ -209,7 +210,7 @@ describe('Generation', function() {
 
 		beforeEach(function() {
 			settings = { mutationRate: 0.1 };
-			generation = new Generation([], settings);
+			generation = new Generation(settings);
 			foo = new Individual('foo');
 			bar = new Individual('bar');
 			fooPrime = new Individual('foo-prime');
@@ -256,10 +257,8 @@ describe('Generation', function() {
 	describe('#getNextGeneration', function() {
 		it('returns an empty generation with copied settings', function() {
 			let settings = { foo: 'bar' };
-			let generation = new Generation(
-				[ new Individual('baz') ],
-				settings
-			);
+			let generation = new Generation(settings);
+			generation.add(new Individual('baz'));
 
 			let result = generation.getNextGeneration();
 
