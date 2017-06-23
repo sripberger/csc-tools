@@ -73,6 +73,18 @@ describe('Generation', function() {
 		});
 	});
 
+	describe('#getSize', function() {
+		it('returns length of individuals array', function() {
+			let generation = new Generation();
+			let foo = new Individual('foo');
+			let bar = new Individual('bar');
+			let baz = new Individual('baz');
+			generation.add(foo, bar, baz);
+
+			expect(generation.getSize()).to.equal(3);
+		});
+	});
+
 	describe('#getSample', function() {
 		let generation, sample;
 
