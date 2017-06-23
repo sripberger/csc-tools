@@ -229,4 +229,21 @@ describe('Generation', function() {
 			expect(result).to.deep.equal([ fooPrime, barPrime ]);
 		});
 	});
+
+	describe('#getNextGeneration', function() {
+		it('returns an empty generation with copied settings', function() {
+			let settings = { foo: 'bar' };
+			let generation = new Generation(
+				[ new Individual('baz') ],
+				settings
+			);
+
+			let result = generation.getNextGeneration();
+
+			expect(result).to.be.an.instanceof(Generation);
+			expect(result.individuals).to.deep.equal([]);
+			expect(result.settings).to.deep.equal(settings);
+			expect(result.settings).to.not.equal(settings);
+		});
+	});
 });
