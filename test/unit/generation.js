@@ -85,6 +85,38 @@ describe('Generation', function() {
 		});
 	});
 
+	describe('#getBest', function() {
+		let generation;
+
+		beforeEach(function() {
+			generation = new Generation();
+		});
+
+		it('returns highest-scoring inidividual', function() {
+			let foo = new Individual('foo');
+			let bar = new Individual('bar');
+			let baz = new Individual('baz');
+			sandbox.stub(foo, 'getFitnessScore').returns(8);
+			sandbox.stub(bar, 'getFitnessScore').returns(10);
+			sandbox.stub(baz, 'getFitnessScore').returns(9);
+			generation.add(foo, bar, baz);
+
+			let result = generation.getBest();
+
+			expect(foo.getFitnessScore).to.be.called;
+			expect(foo.getFitnessScore).to.always.be.calledOn(foo);
+			expect(bar.getFitnessScore).to.be.called;
+			expect(bar.getFitnessScore).to.always.be.calledOn(bar);
+			expect(baz.getFitnessScore).to.be.called;
+			expect(baz.getFitnessScore).to.always.be.calledOn(baz);
+			expect(result).to.equal(bar);
+		});
+
+		it('returns null if generation is empty', function() {
+			expect(generation.getBest()).to.be.null;
+		});
+	});
+
 	describe('#getSample', function() {
 		let generation, sample;
 
