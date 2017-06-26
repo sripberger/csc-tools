@@ -1,26 +1,7 @@
 const Generation = require('../../lib/generation');
 const sinon = require('sinon');
-const XError = require('xerror');
+const Individual = require('../lib/individual');
 const _ = require('lodash');
-
-// Simple Individual class for testing purposes.
-class Individual {
-	constructor(id) {
-		this.id = id;
-	}
-
-	getFitnessScore() {
-		throw new XError(XError.NOT_IMPLEMENTED);
-	}
-
-	crossover() {
-		throw new XError(XError.NOT_IMPLEMENTED);
-	}
-
-	mutate() {
-		throw new XError(XError.NOT_IMPLEMENTED);
-	}
-}
 
 describe('Generation', function() {
 	let sandbox;

@@ -1,17 +1,7 @@
 const Runner = require('../../lib/runner');
 const sinon = require('sinon');
 const Generation = require('../../lib/generation');
-const XError = require('xerror');
-
-class Individual {
-	constructor(id) {
-		this.id = id;
-	}
-
-	isSolution() {
-		throw new XError(XError.NOT_IMPLEMENTED);
-	}
-}
+const Individual = require('../lib/individual');
 
 describe('Runner', function() {
 	it('initializes instance with provided generation and generation limit', function() {
