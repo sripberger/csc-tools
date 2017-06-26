@@ -200,10 +200,12 @@ describe('TournamentGenerator', function() {
 			expect(rankList.shuffle).to.be.calledOnce;
 			expect(rankList.shuffle).to.be.calledOn(rankList);
 			expect(result).to.be.an.instanceof(Tournament);
-			expect(result.poolCount).to.equal(poolCount);
 			expect(result.rankList).to.equal(shuffledList);
-			expect(result.ignoredRegion).to.equal(ignoredRegion);
-			expect(result.targetCollisionScore).to.equal(minimumCollisionScore);
+			expect(result.settings).to.deep.equal({
+				poolCount,
+				ignoredRegion,
+				targetCollisionScore: minimumCollisionScore
+			});
 		});
 	});
 });

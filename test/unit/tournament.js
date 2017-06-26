@@ -15,30 +15,22 @@ describe('Tournament', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided rank list and settings', function() {
+	it('stores provided rank list and settings object', function() {
 		let rankList = new RankList();
-		let settings = {
-			poolCount: 4,
-			ignoredRegion: 'ignored region',
-			targetCollisionScore: 42,
-		};
+		let settings = { foo: 'bar' };
 
 		let tournament = new Tournament(rankList, settings);
 
 		expect(tournament.rankList).to.equal(rankList);
-		expect(tournament.poolCount).to.equal(settings.poolCount);
-		expect(tournament.ignoredRegion).to.equal(settings.ignoredRegion);
-		expect(tournament.targetCollisionScore).to.equal(settings.targetCollisionScore);
+		expect(tournament.settings).to.equal(settings);
 	});
 
-	it('defaults to empty rank list and default settings', function() {
+	it('defaults to empty rank list and settings object', function() {
 		let tournament = new Tournament();
 
 		expect(tournament.rankList).to.be.an.instanceof(RankList);
 		expect(tournament.rankList.ranks).to.deep.equal([]);
-		expect(tournament.poolCount).to.equal(1);
-		expect(tournament.ignoredRegion).to.be.null;
-		expect(tournament.targetCollisionScore).to.equal(0);
+		expect(tournament.settings).to.deep.equal({});
 	});
 
 	describe('#getPools', function() {
@@ -86,7 +78,8 @@ describe('Tournament', function() {
 
 	describe('#getCollisionScore', function() {
 		it('returns sum of collision scores from all pools', function() {
-			let tournament = new Tournament([], { ignoredRegion: 'baz' });
+			let ignoredRegion = 'baz';
+			let tournament = new Tournament([], { ignoredRegion });
 			let fooPool = new Pool([ { tag: 'foo' }]);
 			let barPool = new Pool([ { tag: 'bar' }]);
 			sandbox.stub(tournament, 'getPools').returns([ fooPool, barPool ]);
@@ -99,10 +92,10 @@ describe('Tournament', function() {
 			expect(tournament.getPools).to.be.calledOn(tournament);
 			expect(fooPool.getCollisionScore).to.be.calledOnce;
 			expect(fooPool.getCollisionScore).to.be.calledOn(fooPool);
-			expect(fooPool.getCollisionScore).to.be.calledWith(tournament.ignoredRegion);
+			expect(fooPool.getCollisionScore).to.be.calledWith(ignoredRegion);
 			expect(barPool.getCollisionScore).to.be.calledOnce;
 			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
-			expect(barPool.getCollisionScore).to.be.calledWith(tournament.ignoredRegion);
+			expect(barPool.getCollisionScore).to.be.calledWith(ignoredRegion);
 			expect(result).to.equal(5);
 		});
 	});
