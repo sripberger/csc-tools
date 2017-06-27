@@ -58,20 +58,21 @@ describe('Rank', function() {
 	});
 
 	describe('#mutate', function() {
-		it('returns a mutated copy created using utils::reciprocalExchange', function() {
+		it('returns a copy with players swapped based on utils::getMutationIndices', function() {
 			let foo = { tag: 'foo' };
 			let bar = { tag: 'bar' };
-			let rank = new Rank([ foo, bar ]);
-			let rate = 0.001;
-			sandbox.stub(utils, 'reciprocalExchange').returns([ bar, foo ]);
+			let baz = { tag: 'baz' };
+			let qux = { tag: 'qux' };
+			let rank = new Rank([ foo, bar, baz, qux ]);
+			sandbox.stub(utils, 'getMutationIndices').returns([ 0, 2 ]);
 
-			let result = rank.mutate(rate);
+			let result = rank.mutate();
 
-			expect(utils.reciprocalExchange).to.be.calledOnce;
-			expect(utils.reciprocalExchange).to.be.calledOn(utils);
-			expect(utils.reciprocalExchange).to.be.calledWith(rank.players, rate);
+			expect(utils.getMutationIndices).to.be.calledOnce;
+			expect(utils.getMutationIndices).to.be.calledOn(utils);
+			expect(utils.getMutationIndices).to.be.calledWith(rank.players.length);
 			expect(result).to.be.an.instanceof(Rank);
-			expect(result.players).to.deep.equal([ bar, foo ]);
+			expect(result.players).to.deep.equal([ baz, bar, foo, qux ]);
 		});
 	});
 });

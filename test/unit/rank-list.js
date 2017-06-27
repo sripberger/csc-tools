@@ -147,26 +147,43 @@ describe('RankList', function() {
 	});
 
 	describe('#mutate', function() {
-		it('returns a mutated copy', function() {
-			let fooRank = new Rank([ { tag: 'foo' } ]);
-			let barRank = new Rank([ { tag: 'bar' } ]);
-			let bazRank = new Rank([ { tag: 'baz' } ]);
-			let quxRank = new Rank([ { tag: 'qux' } ]);
-			let rankList = new RankList([ fooRank, barRank ]);
-			let rate = 0.001;
-			sinon.stub(fooRank, 'mutate').returns(bazRank);
-			sinon.stub(barRank, 'mutate').returns(quxRank);
+		it('returns a mutated copy based on provided mutation rate', function() {
+			let foo = new Rank([ { tag: 'foo' } ]);
+			let bar = new Rank([ { tag: 'bar' } ]);
+			let baz = new Rank([ { tag: 'baz' } ]);
+			let qux = new Rank([ { tag: 'qux' } ]);
+			let fooPrime = new Rank([ { tag: 'foo-prime' } ]);
+			let barPrime = new Rank([ { tag: 'bar-prime' } ]);
+			let bazPrime = new Rank([ { tag: 'baz-prime' } ]);
+			let quxPrime = new Rank([ { tag: 'qux-prime' } ]);
+			let rankList = new RankList([ foo, bar, baz, qux ]);
+			let rate = 0.1;
+			sandbox.stub(_, 'random')
+				.onCall(0).returns(0.09)
+				.onCall(1).returns(0.11)
+				.onCall(2).returns(0.05)
+				.onCall(3).returns(0.1);
+			sandbox.stub(foo, 'mutate').returns(fooPrime);
+			sandbox.stub(bar, 'mutate').returns(barPrime);
+			sandbox.stub(baz, 'mutate').returns(bazPrime);
+			sandbox.stub(qux, 'mutate').returns(quxPrime);
 
 			let result = rankList.mutate(rate);
 
-			expect(fooRank.mutate).to.be.calledOnce;
-			expect(fooRank.mutate).to.be.calledOn(fooRank);
-			expect(fooRank.mutate).to.be.calledWith(rate);
-			expect(barRank.mutate).to.be.calledOnce;
-			expect(barRank.mutate).to.be.calledOn(barRank);
-			expect(barRank.mutate).to.be.calledWith(rate);
+			expect(_.random).to.have.callCount(4);
+			expect(_.random).to.always.be.calledOn(_);
+			expect(_.random).to.always.be.calledWith(0, 1, true);
+			expect(foo.mutate).to.be.calledOnce;
+			expect(foo.mutate).to.be.calledOn(foo);
+			expect(baz.mutate).to.be.calledOnce;
+			expect(baz.mutate).to.be.calledOn(baz);
 			expect(result).to.be.an.instanceof(RankList);
-			expect(result.ranks).to.deep.equal([ bazRank, quxRank ]);
+			expect(result.ranks).to.deep.equal([
+				fooPrime,
+				bar,
+				bazPrime,
+				qux
+			]);
 		});
 	});
 });
