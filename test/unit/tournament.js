@@ -166,4 +166,23 @@ describe('Tournament', function() {
 			expect(result).to.be.false;
 		});
 	});
+
+	describe('#mutate', function() {
+		it('returns copy mutated with provided rate', function() {
+			let rate = 0.1;
+			let rankList = new RankList();
+			let mutatedRankList = new RankList();
+			let tournament = new Tournament(rankList, { foo: 'bar' });
+			sandbox.stub(rankList, 'mutate').returns(mutatedRankList);
+
+			let result = tournament.mutate(rate);
+
+			expect(rankList.mutate).to.be.calledOnce;
+			expect(rankList.mutate).to.be.calledOn(rankList);
+			expect(rankList.mutate).to.be.calledWith(rate);
+			expect(result).to.be.an.instanceof(Tournament);
+			expect(result.rankList).to.equal(mutatedRankList);
+			expect(result.settings).to.equal(tournament.settings);
+		});
+	});
 });
