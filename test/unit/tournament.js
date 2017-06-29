@@ -144,26 +144,26 @@ describe('Tournament', function() {
 
 		beforeEach(function() {
 			tournament = new Tournament();
-			sandbox.stub(tournament, 'getCollisionScore');
+			sandbox.stub(tournament, 'getFitnessScore');
 		});
 
 		it('returns true if fitness score is Infinity', function() {
-			tournament.getCollisionScore.returns(Infinity);
+			tournament.getFitnessScore.returns(Infinity);
 
 			let result = tournament.isSolution();
 
-			expect(tournament.getCollisionScore).to.be.calledOnce;
-			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
+			expect(tournament.getFitnessScore).to.be.calledOnce;
+			expect(tournament.getFitnessScore).to.be.calledOn(tournament);
 			expect(result).to.be.true;
 		});
 
 		it('returns false otherwise', function() {
-			tournament.getCollisionScore.returns(42);
+			tournament.getFitnessScore.returns(42);
 
 			let result = tournament.isSolution();
 
-			expect(tournament.getCollisionScore).to.be.calledOnce;
-			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
+			expect(tournament.getFitnessScore).to.be.calledOnce;
+			expect(tournament.getFitnessScore).to.be.calledOn(tournament);
 			expect(result).to.be.false;
 		});
 	});
