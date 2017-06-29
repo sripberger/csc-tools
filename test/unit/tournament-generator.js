@@ -179,33 +179,63 @@ describe('TournamentGenerator', function() {
 		});
 	});
 
-	describe('#generateTournament', function() {
-		it('returns a Tournament with shuffled rank list and copied settings', function() {
-			let rankList = new RankList();
-			let poolCount = 4;
-			let generator = new TournamentGenerator(rankList, poolCount);
-			let ignoredRegion = 'ignored region';
-			let minimumCollisionScore = 42;
-			let shuffledList = new RankList();
-			sandbox.stub(generator, 'getIgnoredRegion').returns(ignoredRegion);
-			sandbox.stub(generator, 'getMinimumCollisionScore').returns(minimumCollisionScore);
-			sandbox.stub(rankList, 'shuffle').returns(shuffledList);
+	describe('#getTournamentSettings', function() {
+		const ignoredRegion = 'ignoredRegion';
+		const minimumCollisionScore = 42;
+		let generator;
 
-			let result = generator.generateTournament();
+		beforeEach(function() {
+			generator = new TournamentGenerator(new RankList(), 4);
+			sandbox.stub(generator, 'getIgnoredRegion').returns(ignoredRegion);
+			sandbox.stub(generator, 'getMinimumCollisionScore')
+				.returns(minimumCollisionScore);
+		});
+
+		it('returns a settings object for generated tournaments', function() {
+			let result = generator.getTournamentSettings();
 
 			expect(generator.getIgnoredRegion).to.be.calledOnce;
 			expect(generator.getIgnoredRegion).to.be.calledOn(generator);
 			expect(generator.getMinimumCollisionScore).to.be.calledOnce;
 			expect(generator.getMinimumCollisionScore).to.be.calledOn(generator);
+			expect(result).to.deep.equal({
+				poolCount: generator.poolCount,
+				ignoredRegion,
+				targetCollisionScore: minimumCollisionScore
+			});
+		});
+
+		it('caches result', function () {
+			let firstResult = generator.getTournamentSettings();
+			sandbox.resetHistory();
+
+			let secondResult = generator.getTournamentSettings();
+
+			expect(generator.getIgnoredRegion).to.not.be.called;
+			expect(generator.getMinimumCollisionScore).to.not.be.called;
+			expect(secondResult).to.equal(firstResult);
+		});
+	});
+
+	describe('#generateTournament', function() {
+		it('returns a Tournament with settings and shuffled rank list', function() {
+			let generator = new TournamentGenerator();
+			let { rankList } = generator;
+			let shuffledList = new RankList();
+			let tournamentSettings = { foo: 'bar '};
+			sandbox.stub(rankList, 'shuffle').returns(shuffledList);
+			sandbox.stub(generator, 'getTournamentSettings')
+				.returns(tournamentSettings);
+
+			let result = generator.generateTournament();
+
+			expect(generator.getTournamentSettings).to.be.calledOnce;
+			expect(generator.getTournamentSettings).to.be.calledOn(generator);
 			expect(rankList.shuffle).to.be.calledOnce;
 			expect(rankList.shuffle).to.be.calledOn(rankList);
 			expect(result).to.be.an.instanceof(Tournament);
 			expect(result.rankList).to.equal(shuffledList);
-			expect(result.settings).to.deep.equal({
-				poolCount,
-				ignoredRegion,
-				targetCollisionScore: minimumCollisionScore
-			});
+			expect(result.settings).to.equal(tournamentSettings);
 		});
 	});
 });
