@@ -133,7 +133,7 @@ describe('utils', function() {
 			expect(result).to.deep.equal([ 3, 7 ]);
 		});
 
-		it('returns smaller of to results first', function() {
+		it('returns smaller of two results first', function() {
 			_.random
 				.onFirstCall().returns(7)
 				.onSecondCall().returns(3);
