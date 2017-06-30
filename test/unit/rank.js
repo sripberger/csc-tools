@@ -1,6 +1,6 @@
 const Rank = require('../../lib/rank');
 const sinon = require('sinon');
-const utils = require('../../lib/utils');
+const _ = require('lodash');
 
 describe('Rank', function() {
 	let sandbox;
@@ -45,32 +45,37 @@ describe('Rank', function() {
 				{ tag: 'foo' }
 			];
 			let rank = new Rank(players);
-			sandbox.stub(utils, 'shuffleArray').returns(shuffledPlayers);
+			sandbox.stub(_, 'shuffle').returns(shuffledPlayers);
 
 			let result = rank.shuffle();
 
-			expect(utils.shuffleArray).to.be.calledOnce;
-			expect(utils.shuffleArray).to.be.calledOn(utils);
-			expect(utils.shuffleArray).to.be.calledWith(rank.players, { copy: true });
+			expect(_.shuffle).to.be.calledOnce;
+			expect(_.shuffle).to.be.calledOn(_);
+			expect(_.shuffle).to.be.calledWith(rank.players);
 			expect(result).to.be.an.instanceof(Rank);
 			expect(result.players).to.equal(shuffledPlayers);
 		});
 	});
 
 	describe('#mutate', function() {
-		it('returns a copy with players swapped based on utils::getMutationIndices', function() {
+		it('returns a copy with two random players swapped', function() {
 			let foo = { tag: 'foo' };
 			let bar = { tag: 'bar' };
 			let baz = { tag: 'baz' };
 			let qux = { tag: 'qux' };
 			let rank = new Rank([ foo, bar, baz, qux ]);
-			sandbox.stub(utils, 'getMutationIndices').returns([ 0, 2 ]);
+			sandbox.stub(_, 'random')
+				.onFirstCall().returns(0)
+				.onSecondCall().returns(2);
 
 			let result = rank.mutate();
 
-			expect(utils.getMutationIndices).to.be.calledOnce;
-			expect(utils.getMutationIndices).to.be.calledOn(utils);
-			expect(utils.getMutationIndices).to.be.calledWith(rank.players.length);
+			expect(_.random).to.be.calledTwice;
+			expect(_.random).to.always.be.calledOn(_);
+			expect(_.random).to.always.be.calledWithExactly(
+				0,
+				rank.players.length - 1
+			);
 			expect(result).to.be.an.instanceof(Rank);
 			expect(result.players).to.deep.equal([ baz, bar, foo, qux ]);
 		});
