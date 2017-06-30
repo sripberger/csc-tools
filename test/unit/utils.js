@@ -1,6 +1,5 @@
 const utils = require('../../lib/utils');
 const sinon = require('sinon');
-const shuffleArray = require('shuffle-array');
 const _ = require('lodash');
 
 describe('utils', function() {
@@ -12,26 +11,6 @@ describe('utils', function() {
 
 	afterEach(function() {
 		sandbox.restore();
-	});
-
-	describe('::shuffleArray', function() {
-		it('is shuffle-array module', function() {
-			expect(utils.shuffleArray).to.equal(shuffleArray);
-		});
-	});
-
-	describe('::pickFromArray', function() {
-		it('returns result of shuffle-array pick method with provided count', function() {
-			let array = [ 'foo', 'bar', 'baz' ];
-			sandbox.stub(shuffleArray, 'pick').returns([ 'foo', 'baz' ]);
-
-			let result = utils.pickFromArray(array, 2);
-
-			expect(shuffleArray.pick).to.be.calledOnce;
-			expect(shuffleArray.pick).to.be.calledOn(shuffleArray);
-			expect(shuffleArray.pick).to.be.calledWith(array, { picks: 2 });
-			expect(result).to.deep.equal([ 'foo', 'baz' ]);
-		});
 	});
 
 	describe('::getPoolIndex', function() {
@@ -139,22 +118,6 @@ describe('utils', function() {
 				.onSecondCall().returns(3);
 
 			expect(utils.getCrossoverRange(length)).to.deep.equal([ 3, 7 ]);
-		});
-	});
-
-	describe('::getMutationIndices', function() {
-		it('returns two random incides between 0 length minus 1', function() {
-			let length = 10;
-			sandbox.stub(_, 'random')
-				.onFirstCall().returns(3)
-				.onSecondCall().returns(7);
-
-			let result = utils.getMutationIndices(length);
-
-			expect(_.random).to.be.calledTwice;
-			expect(_.random).to.always.be.calledOn(_);
-			expect(_.random).to.always.be.calledWith(0, length - 1);
-			expect(result).to.deep.equal([ 3, 7 ]);
 		});
 	});
 
