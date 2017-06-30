@@ -62,4 +62,41 @@ describe('TournamentSelector', function() {
 			expect(result).to.equal(sample);
 		});
 	});
+
+	describe('#select', function() {
+		let selector;
+
+		beforeEach(function() {
+			selector = new TournamentSelector();
+			sinon.stub(selector, 'getTournament');
+		});
+
+		it('returns highest-scoring individual from tournament', function() {
+			let foo = new Individual('foo');
+			let bar = new Individual('bar');
+			let baz = new Individual('baz');
+			sinon.stub(foo, 'getFitnessScore').returns(8);
+			sinon.stub(bar, 'getFitnessScore').returns(10);
+			sinon.stub(baz, 'getFitnessScore').returns(9);
+			selector.getTournament.returns([ foo, bar, baz ]);
+
+			let result = selector.select();
+
+			expect(selector.getTournament).to.be.calledOnce;
+			expect(selector.getTournament).to.be.calledOn(selector);
+			expect(foo.getFitnessScore).to.be.called;
+			expect(foo.getFitnessScore).to.always.be.calledOn(foo);
+			expect(bar.getFitnessScore).to.be.called;
+			expect(bar.getFitnessScore).to.always.be.calledOn(bar);
+			expect(baz.getFitnessScore).to.be.called;
+			expect(baz.getFitnessScore).to.always.be.calledOn(baz);
+			expect(result).to.equal(bar);
+		});
+
+		it('returns null if selector is empty', function() {
+			selector.getTournament.returns([]);
+
+			expect(selector.select()).to.be.null;
+		});
+	});
 });
