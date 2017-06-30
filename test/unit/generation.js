@@ -1,7 +1,7 @@
 const Generation = require('../../lib/generation');
 const sinon = require('sinon');
+const Selector = require('../../lib/selector');
 const Individual = require('../lib/individual');
-const _ = require('lodash');
 
 describe('Generation', function() {
 	let sandbox;
@@ -14,178 +14,97 @@ describe('Generation', function() {
 		sandbox.restore();
 	});
 
-	it('stores provided settings object and a new individuals array', function() {
+	it('stores provided selector and settings object', function() {
+		let selector = new Selector();
 		let settings = { foo: 'bar' };
 
-		let generation = new Generation(settings);
+		let generation = new Generation(selector, settings);
 
+		expect(generation.selector).to.equal(selector);
 		expect(generation.settings).to.equal(settings);
-		expect(generation.individuals).to.deep.equal([]);
 	});
 
 	it('defaults to an empty settings object', function() {
-		let generation = new Generation();
+		let selector = new Selector();
 
+		let generation = new Generation(selector);
+
+		expect(generation.selector).to.equal(selector);
 		expect(generation.settings).to.deep.equal({});
-		expect(generation.individuals).to.deep.equal([]);
 	});
 
 	describe('#add', function() {
-		let generation, foo, bar, baz;
+		let selector, generation, foo, bar;
 
 		beforeEach(function() {
-			generation = new Generation();
+			selector = new Selector();
+			generation = new Generation(selector);
 			foo = new Individual('foo');
 			bar = new Individual('bar');
-			baz = new Individual('baz');
-			generation.add(foo);
+			sinon.stub(selector, 'add');
 		});
 
-		it('pushes provided individual onto individuals array', function() {
-			generation.add(bar);
+		it('adds individual to selector', function() {
+			generation.add(foo);
 
-			expect(generation.individuals).to.deep.equal([ foo, bar ]);
+			expect(selector.add).to.be.calledOnce;
+			expect(selector.add).to.be.calledOn(selector);
+			expect(selector.add).to.be.calledWithExactly(foo);
 		});
 
 		it('supports multiple arguments', function() {
-			generation.add(bar, baz);
+			generation.add(foo, bar);
 
-			expect(generation.individuals).to.deep.equal([ foo, bar, baz ]);
+			expect(selector.add).to.be.calledTwice;
+			expect(selector.add).to.always.be.calledOn(selector);
+			expect(selector.add).to.be.calledWithExactly(foo);
+			expect(selector.add).to.be.calledWithExactly(bar);
 		});
 	});
 
 	describe('#getSize', function() {
-		it('returns length of individuals array', function() {
-			let generation = new Generation();
-			let foo = new Individual('foo');
-			let bar = new Individual('bar');
-			let baz = new Individual('baz');
-			generation.add(foo, bar, baz);
+		it('returns selector size', function() {
+			let selector = new Selector();
+			let generation = new Generation(selector);
+			let selectorSize = 42;
+			sinon.stub(selector, 'getSize').returns(selectorSize);
 
-			expect(generation.getSize()).to.equal(3);
+			let result = generation.getSize();
+
+			expect(selector.getSize).to.be.calledOnce;
+			expect(selector.getSize).to.be.calledOn(selector);
+			expect(result).to.equal(selectorSize);
 		});
 	});
 
 	describe('#getBest', function() {
-		let generation;
-
-		beforeEach(function() {
-			generation = new Generation();
-		});
-
-		it('returns highest-scoring inidividual', function() {
-			let foo = new Individual('foo');
-			let bar = new Individual('bar');
-			let baz = new Individual('baz');
-			sandbox.stub(foo, 'getFitnessScore').returns(8);
-			sandbox.stub(bar, 'getFitnessScore').returns(10);
-			sandbox.stub(baz, 'getFitnessScore').returns(9);
-			generation.add(foo, bar, baz);
+		it('returns best individual from selector', function() {
+			let selector = new Selector();
+			let generation = new Generation(selector);
+			let best = new Individual('best');
+			sinon.stub(selector, 'getBest').returns(best);
 
 			let result = generation.getBest();
 
-			expect(foo.getFitnessScore).to.be.called;
-			expect(foo.getFitnessScore).to.always.be.calledOn(foo);
-			expect(bar.getFitnessScore).to.be.called;
-			expect(bar.getFitnessScore).to.always.be.calledOn(bar);
-			expect(baz.getFitnessScore).to.be.called;
-			expect(baz.getFitnessScore).to.always.be.calledOn(baz);
-			expect(result).to.equal(bar);
-		});
-
-		it('returns null if generation is empty', function() {
-			expect(generation.getBest()).to.be.null;
-		});
-	});
-
-	describe('#getSample', function() {
-		let generation, sample;
-
-		beforeEach(function() {
-			let foo = new Individual('foo');
-			let bar = new Individual('bar');
-			let baz = new Individual('baz');
-
-			generation = new Generation();
-			sample = [ foo, bar ];
-
-			generation.add(foo, bar, baz );
-			sandbox.stub(_, 'sampleSize').returns(sample);
-		});
-
-		it('returns a random subset of settings.sampleSize', function() {
-			generation.settings.sampleSize = 1;
-
-			let result = generation.getSample();
-
-			expect(_.sampleSize).to.be.calledOnce;
-			expect(_.sampleSize).to.be.calledOn(_);
-			expect(_.sampleSize).to.be.calledWith(
-				generation.individuals,
-				generation.settings.sampleSize
-			);
-			expect(result).to.equal(sample);
-		});
-
-		it('defaults to sample size of 2', function() {
-			let result = generation.getSample();
-
-			expect(_.sampleSize).to.be.calledOnce;
-			expect(_.sampleSize).to.be.calledOn(_);
-			expect(_.sampleSize).to.be.calledWith(generation.individuals, 2);
-			expect(result).to.equal(sample);
-		});
-	});
-
-	describe('#select', function() {
-		let generation;
-
-		beforeEach(function() {
-			generation = new Generation();
-			sandbox.stub(generation, 'getSample');
-		});
-
-		it('returns highest-scoring individual from a random sample', function() {
-			let foo = new Individual('foo');
-			let bar = new Individual('bar');
-			let baz = new Individual('baz');
-			sandbox.stub(foo, 'getFitnessScore').returns(8);
-			sandbox.stub(bar, 'getFitnessScore').returns(10);
-			sandbox.stub(baz, 'getFitnessScore').returns(9);
-			generation.getSample.returns([ foo, bar, baz ]);
-
-			let result = generation.select();
-
-			expect(generation.getSample).to.be.calledOnce;
-			expect(generation.getSample).to.be.calledOn(generation);
-			expect(foo.getFitnessScore).to.be.called;
-			expect(foo.getFitnessScore).to.always.be.calledOn(foo);
-			expect(bar.getFitnessScore).to.be.called;
-			expect(bar.getFitnessScore).to.always.be.calledOn(bar);
-			expect(baz.getFitnessScore).to.be.called;
-			expect(baz.getFitnessScore).to.always.be.calledOn(baz);
-			expect(result).to.equal(bar);
-		});
-
-		it('returns null if generation is empty', function() {
-			generation.getSample.returns([]);
-
-			expect(generation.select()).to.be.null;
+			expect(selector.getBest).to.be.calledOnce;
+			expect(selector.getBest).to.be.calledOn(selector);
+			expect(result).to.equal(best);
 		});
 	});
 
 	describe('#getUnmutatedOffspring', function() {
-		let settings, generation, foo, bar, fooBar, barFoo;
+		let selector, settings, generation, foo, bar, fooBar, barFoo;
 
 		beforeEach(function() {
+			selector = new Selector();
 			settings = { crossoverRate: 0.7 };
-			generation = new Generation(settings);
+			generation = new Generation(selector, settings);
 			foo = new Individual('foo');
 			bar = new Individual('bar');
 			fooBar = new Individual('foo-bar');
 			barFoo = new Individual('bar-foo');
 
-			sandbox.stub(generation, 'select')
+			sandbox.stub(selector, 'select')
 				.onFirstCall().returns(foo)
 				.onSecondCall().returns(bar);
 
@@ -195,8 +114,8 @@ describe('Generation', function() {
 		it('creates offspring from two selected mates', function() {
 			let result = generation.getUnmutatedOffspring();
 
-			expect(generation.select).to.be.calledTwice;
-			expect(generation.select).to.always.be.calledOn(generation);
+			expect(selector.select).to.be.calledTwice;
+			expect(selector.select).to.always.be.calledOn(selector);
 			expect(foo.crossover).to.be.calledOnce;
 			expect(foo.crossover).to.be.calledOn(foo);
 			expect(foo.crossover).to.be.calledWith(bar, settings.crossoverRate);
@@ -208,8 +127,8 @@ describe('Generation', function() {
 
 			let result = generation.getUnmutatedOffspring();
 
-			expect(generation.select).to.be.calledTwice;
-			expect(generation.select).to.always.be.calledOn(generation);
+			expect(selector.select).to.be.calledTwice;
+			expect(selector.select).to.always.be.calledOn(selector);
 			expect(foo.crossover).to.be.calledOnce;
 			expect(foo.crossover).to.be.calledOn(foo);
 			expect(foo.crossover).to.be.calledWith(bar, 0);
@@ -221,8 +140,8 @@ describe('Generation', function() {
 
 			let result = generation.getUnmutatedOffspring();
 
-			expect(generation.select).to.be.calledTwice;
-			expect(generation.select).to.always.be.calledOn(generation);
+			expect(selector.select).to.be.calledTwice;
+			expect(selector.select).to.always.be.calledOn(selector);
 			expect(foo.crossover).to.be.calledOnce;
 			expect(foo.crossover).to.be.calledOn(foo);
 			expect(foo.crossover).to.be.calledWith(bar, settings.crossoverRate);
@@ -235,7 +154,7 @@ describe('Generation', function() {
 
 		beforeEach(function() {
 			settings = { mutationRate: 0.1 };
-			generation = new Generation(settings);
+			generation = new Generation(new Selector(), settings);
 			foo = new Individual('foo');
 			bar = new Individual('bar');
 			fooPrime = new Individual('foo-prime');
@@ -279,18 +198,21 @@ describe('Generation', function() {
 		});
 	});
 
-	describe('#getNextGeneration', function() {
-		it('returns an empty generation with copied settings', function() {
+	describe('#getNext', function() {
+		it('returns a new generation with next selector and same settings', function() {
 			let settings = { foo: 'bar' };
-			let generation = new Generation(settings);
-			generation.add(new Individual('baz'));
+			let selector = new Selector();
+			let generation = new Generation(selector, settings);
+			let nextSelector = new Selector();
+			sinon.stub(selector, 'getNext').returns(nextSelector);
 
-			let result = generation.getNextGeneration();
+			let result = generation.getNext();
 
+			expect(selector.getNext).to.be.calledOnce;
+			expect(selector.getNext).to.be.calledOn(selector);
 			expect(result).to.be.an.instanceof(Generation);
-			expect(result.individuals).to.deep.equal([]);
-			expect(result.settings).to.deep.equal(settings);
-			expect(result.settings).to.not.equal(settings);
+			expect(result.selector).to.equal(nextSelector);
+			expect(result.settings).to.equal(settings);
 		});
 	});
 });

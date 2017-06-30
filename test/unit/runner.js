@@ -17,24 +17,18 @@ describe('Runner', function() {
 		expect(runner.solution).to.be.null;
 	});
 
-	it('uses appropriate defaults', function() {
+	it('uses default generation limit of Infinity', function() {
 		let runner = new Runner();
 
-		expect(runner.generation).to.be.an.instanceof(Generation);
-		expect(runner.generation.individuals).to.deep.equal([]);
-		expect(runner.generation.settings).to.deep.equal({});
 		expect(runner.generationLimit).to.equal(Infinity);
-		expect(runner.oldGeneration).to.be.null;
-		expect(runner.generationCount).to.equal(0);
-		expect(runner.solution).to.be.null;
 	});
 
 	describe('#checkForSolution', function() {
-		let runner, generation, best;
+		let generation, runner, best;
 
 		beforeEach(function() {
-			runner = new Runner();
-			generation = runner.generation;
+			generation = new Generation();
+			runner = new Runner(generation);
 			best = new Individual('best');
 			sinon.stub(generation, 'getBest').returns(best);
 			sinon.stub(best, 'isSolution').returns(false);
@@ -65,16 +59,16 @@ describe('Runner', function() {
 
 	describe('#startNewGeneration', function() {
 		it('advances generations and increments generation count', function() {
-			let runner = new Runner();
-			let generation = runner.generation;
+			let generation = new Generation();
+			let runner = new Runner(generation);
 			let nextGeneration = new Generation();
-			sinon.stub(generation, 'getNextGeneration').returns(nextGeneration);
+			sinon.stub(generation, 'getNext').returns(nextGeneration);
 			runner.generationCount = 2;
 
 			runner.startNewGeneration();
 
-			expect(generation.getNextGeneration).to.be.calledOnce;
-			expect(generation.getNextGeneration).to.be.calledOn(generation);
+			expect(generation.getNext).to.be.calledOnce;
+			expect(generation.getNext).to.be.calledOn(generation);
 			expect(runner.oldGeneration).to.equal(generation);
 			expect(runner.generation).to.equal(nextGeneration);
 			expect(runner.generationCount).to.equal(3);
@@ -82,11 +76,11 @@ describe('Runner', function() {
 	});
 
 	describe('#runStep', function() {
-		let runner, oldGeneration, generation, foo, bar;
+		let generation, runner, oldGeneration, foo, bar;
 
 		beforeEach(function() {
-			runner = new Runner();
-			generation = runner.generation;
+			generation = new Generation();
+			runner = new Runner(generation);
 			oldGeneration = runner.oldGeneration = new Generation();
 			foo = new Individual('foo');
 			bar = new Individual('bar');
@@ -122,11 +116,11 @@ describe('Runner', function() {
 	});
 
 	describe('#populateGeneration', function() {
-		let runner, oldGeneration, generation, generationSize;
+		let generation, runner, oldGeneration, generationSize;
 
 		beforeEach(function() {
-			runner = new Runner();
-			generation = runner.generation;
+			generation = new Generation();
+			runner = new Runner(generation);
 			oldGeneration = runner.oldGeneration = new Generation();
 			generationSize = 0;
 
@@ -244,11 +238,11 @@ describe('Runner', function() {
 	});
 
 	describe('#getBest', function() {
-		let runner, generation, best;
+		let generation, runner, best;
 
 		beforeEach(function() {
-			runner = new Runner();
-			generation = runner.generation;
+			generation = new Generation();
+			runner = new Runner(generation);
 			best = new Individual('best');
 			sinon.stub(generation, 'getBest').returns(best);
 		});
