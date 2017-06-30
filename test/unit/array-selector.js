@@ -26,36 +26,26 @@ describe('ArraySelector', function() {
 	});
 
 	describe('#add', function() {
-		let selector, foo, bar, baz;
-
-		beforeEach(function() {
-			selector = new ArraySelector();
-			foo = new Individual('foo');
-			bar = new Individual('bar');
-			baz = new Individual('baz');
-			selector.add(foo);
-		});
-
 		it('pushes provided individual onto individuals array', function() {
+			let selector = new ArraySelector();
+			let foo = new Individual('foo');
+			let bar = new Individual('bar');
+			selector.individuals = [ foo ];
+
 			selector.add(bar);
 
 			expect(selector.individuals).to.deep.equal([ foo, bar ]);
-		});
-
-		it('supports multiple arguments', function() {
-			selector.add(bar, baz);
-
-			expect(selector.individuals).to.deep.equal([ foo, bar, baz ]);
 		});
 	});
 
 	describe('#getSize', function() {
 		it('returns length of individuals array', function() {
 			let selector = new ArraySelector();
-			let foo = new Individual('foo');
-			let bar = new Individual('bar');
-			let baz = new Individual('baz');
-			selector.add(foo, bar, baz);
+			selector.individuals = [
+				new Individual('foo'),
+				new Individual('bar'),
+				new Individual('baz')
+			];
 
 			expect(selector.getSize()).to.equal(3);
 		});
@@ -75,7 +65,7 @@ describe('ArraySelector', function() {
 			sinon.stub(foo, 'getFitnessScore').returns(8);
 			sinon.stub(bar, 'getFitnessScore').returns(10);
 			sinon.stub(baz, 'getFitnessScore').returns(9);
-			selector.add(foo, bar, baz);
+			selector.individuals = [ foo, bar, baz ];
 
 			let result = selector.getBest();
 
@@ -88,7 +78,7 @@ describe('ArraySelector', function() {
 			expect(result).to.equal(bar);
 		});
 
-		it('returns null if generation is empty', function() {
+		it('returns null if individuals array is empty', function() {
 			expect(selector.getBest()).to.be.null;
 		});
 	});
