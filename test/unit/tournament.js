@@ -1,4 +1,6 @@
 const Tournament = require('../../lib/tournament');
+// TODO: Add gene-lib dependency once it is published.
+const { Individual } = require('gene-lib');
 const sinon = require('sinon');
 const RankList = require('../../lib/rank-list');
 const utils = require('../../lib/utils');
@@ -14,6 +16,10 @@ describe('Tournament', function() {
 
 	afterEach(function() {
 		sandbox.restore();
+	});
+
+	it('extends gene-lib Individual class', function() {
+		expect(new Tournament()).to.be.an.instanceof(Individual);
 	});
 
 	it('stores provided rank list and settings object', function() {
@@ -101,74 +107,20 @@ describe('Tournament', function() {
 		});
 	});
 
-	describe('#getFitnessScore', function() {
-		let tournament;
-
-		beforeEach(function() {
-			tournament = new Tournament([], { targetCollisionScore: 1 });
-			sandbox.stub(tournament, 'getCollisionScore').returns(3);
-		});
-
+	describe('#calculateFitnessScore', function() {
 		it('returns inverse of difference between collision score and target', function() {
-			let result = tournament.getFitnessScore();
+			let tournament = new Tournament([], { targetCollisionScore: 1 });
+			sandbox.stub(tournament, 'getCollisionScore').returns(3);
+
+			let result = tournament.calculateFitnessScore();
 
 			expect(tournament.getCollisionScore).to.be.calledOnce;
 			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
 			expect(result).to.equal(0.5);
 		});
-
-		it('caches numeric result', function() {
-			tournament.getFitnessScore();
-			sandbox.resetHistory();
-
-			let result = tournament.getFitnessScore();
-
-			expect(tournament.getCollisionScore).to.be.not.be.called;
-			expect(result).to.equal(0.5);
-		});
-
-		it('caches NaN result', function() {
-			tournament.getCollisionScore.returns(NaN);
-			tournament.getFitnessScore();
-			sandbox.resetHistory();
-
-			let result = tournament.getFitnessScore();
-
-			expect(tournament.getCollisionScore).to.be.not.be.called;
-			expect(result).to.be.NaN;
-		});
 	});
 
-	describe('#isSolution', function() {
-		let tournament;
-
-		beforeEach(function() {
-			tournament = new Tournament();
-			sandbox.stub(tournament, 'getFitnessScore');
-		});
-
-		it('returns true if fitness score is Infinity', function() {
-			tournament.getFitnessScore.returns(Infinity);
-
-			let result = tournament.isSolution();
-
-			expect(tournament.getFitnessScore).to.be.calledOnce;
-			expect(tournament.getFitnessScore).to.be.calledOn(tournament);
-			expect(result).to.be.true;
-		});
-
-		it('returns false otherwise', function() {
-			tournament.getFitnessScore.returns(42);
-
-			let result = tournament.isSolution();
-
-			expect(tournament.getFitnessScore).to.be.calledOnce;
-			expect(tournament.getFitnessScore).to.be.calledOn(tournament);
-			expect(result).to.be.false;
-		});
-	});
-
-	describe('crossover', function() {
+	describe('#crossover', function() {
 		const rate = 0.5;
 		let foo, bar, fooRanks, barRanks, fooBarRanks, barFooRanks;
 
