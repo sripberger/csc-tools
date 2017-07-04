@@ -5,7 +5,6 @@ const sinon = require('sinon');
 const RankList = require('../../lib/rank-list');
 const utils = require('../../lib/utils');
 const Pool = require('../../lib/pool');
-const _ = require('lodash');
 
 describe('Tournament', function() {
 	let sandbox;
@@ -121,74 +120,33 @@ describe('Tournament', function() {
 	});
 
 	describe('#crossover', function() {
-		const rate = 0.5;
-		let foo, bar, fooRanks, barRanks, fooBarRanks, barFooRanks;
-
-		beforeEach(function() {
-			foo = new Tournament();
-			bar = new Tournament();
-			fooRanks = foo.rankList;
-			barRanks = bar.rankList;
-			fooBarRanks = new RankList();
-			barFooRanks = new RankList();
-
-			sandbox.stub(_, 'random');
+		it('returns crossed-over copies', function() {
+			let foo = new Tournament();
+			let bar = new Tournament();
+			let fooRanks = foo.rankList;
+			let barRanks = bar.rankList;
+			let fooBarRanks = new RankList();
+			let barFooRanks = new RankList();
 			sandbox.stub(fooRanks, 'crossover').returns([
 				fooBarRanks,
 				barFooRanks
 			]);
-		});
 
-		it('gets a random float between 0 and 1', function() {
-			foo.crossover(bar, rate);
+			let result = foo.crossover(bar);
 
-			expect(_.random).to.be.calledOnce;
-			expect(_.random).to.be.calledOn(_);
-			expect(_.random).to.be.calledWith(0, 1, true);
-		});
-
-		context('random float less than rate', function() {
-			it('returns crossed-over copies', function() {
-				_.random.returns(0.49);
-
-				let result = foo.crossover(bar, rate);
-
-				expect(fooRanks.crossover).to.be.calledOnce;
-				expect(fooRanks.crossover).to.be.calledOn(fooRanks);
-				expect(fooRanks.crossover).to.be.calledWith(
-					sinon.match.same(barRanks)
-				);
-				expect(result).to.be.an.instanceof(Array);
-				expect(result).to.have.length(2);
-				expect(result[0]).to.be.an.instanceof(Tournament);
-				expect(result[0].rankList).to.equal(fooBarRanks);
-				expect(result[0].settings).to.equal(foo.settings);
-				expect(result[1]).to.be.an.instanceof(Tournament);
-				expect(result[1].rankList).to.equal(barFooRanks);
-				expect(result[1].settings).to.equal(foo.settings);
-			});
-		});
-
-		context('random float greater than rate', function() {
-			it('returns instance and other as-is', function() {
-				_.random.returns(0.51);
-
-				let result = foo.crossover(bar, rate);
-
-				expect(fooRanks.crossover).to.not.be.called;
-				expect(result).to.deep.equal([ foo, bar ]);
-			});
-		});
-
-		context('random float equal to rate', function() {
-			it('returns instance and other as-is', function() {
-				_.random.returns(0.5);
-
-				let result = foo.crossover(bar, rate);
-
-				expect(fooRanks.crossover).to.not.be.called;
-				expect(result).to.deep.equal([ foo, bar ]);
-			});
+			expect(fooRanks.crossover).to.be.calledOnce;
+			expect(fooRanks.crossover).to.be.calledOn(fooRanks);
+			expect(fooRanks.crossover).to.be.calledWith(
+				sinon.match.same(barRanks)
+			);
+			expect(result).to.be.an.instanceof(Array);
+			expect(result).to.have.length(2);
+			expect(result[0]).to.be.an.instanceof(Tournament);
+			expect(result[0].rankList).to.equal(fooBarRanks);
+			expect(result[0].settings).to.equal(foo.settings);
+			expect(result[1]).to.be.an.instanceof(Tournament);
+			expect(result[1].rankList).to.equal(barFooRanks);
+			expect(result[1].settings).to.equal(foo.settings);
 		});
 	});
 
