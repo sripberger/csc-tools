@@ -1,7 +1,7 @@
 const RankList = require('../../lib/rank-list');
 const sinon = require('sinon');
+const geneLib = require('gene-lib');
 const Rank = require('../../lib/rank');
-const utils = require('../../lib/utils');
 const _ = require('lodash');
 
 describe('RankList', function() {
@@ -120,13 +120,13 @@ describe('RankList', function() {
 				foo.ranks.push(new Rank([ { tag: 'bar', index } ]));
 				bar.ranks.push(new Rank([ { tag: 'bar', index } ]));
 			});
-			sandbox.stub(utils, 'getCrossoverRange').returns([ 1, 3 ]);
+			sandbox.stub(geneLib, 'getCrossoverRange').returns([ 1, 3 ]);
 
 			let result = foo.crossover(bar);
 
-			expect(utils.getCrossoverRange).to.be.calledOnce;
-			expect(utils.getCrossoverRange).to.be.calledOn(utils);
-			expect(utils.getCrossoverRange).to.be.calledWith(4);
+			expect(geneLib.getCrossoverRange).to.be.calledOnce;
+			expect(geneLib.getCrossoverRange).to.be.calledOn(geneLib);
+			expect(geneLib.getCrossoverRange).to.be.calledWith(4);
 			expect(result).to.be.an.instanceof(Array);
 			expect(result).to.have.length(2);
 			expect(result[0]).to.be.an.instanceof(RankList);
