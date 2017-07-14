@@ -38,6 +38,29 @@ describe('Tournament', function() {
 		expect(tournament.settings).to.deep.equal({});
 	});
 
+	describe('#getPlayers', function() {
+		it('returns array of players in seed order', function() {
+			let foo = { tag: 'foo' };
+			let bar = { tag: 'bar' };
+			let baz = { tag: 'baz' };
+			let tournament = new Tournament();
+			let { rankList } = tournament;
+			sandbox.stub(rankList, 'seedOrder').returns({
+				[Symbol.iterator]: function*() {
+					yield foo;
+					yield bar;
+					yield baz;
+				}
+			});
+
+			let result = tournament.getPlayers();
+
+			expect(rankList.seedOrder).to.be.calledOnce;
+			expect(rankList.seedOrder).to.be.calledOn(rankList);
+			expect(result).to.deep.equal([ foo, bar, baz ]);
+		});
+	});
+
 	describe('#getPoolList', function() {
 		it('arranges players into pools using utils::getPoolIndex', function() {
 			let rankList = new RankList();
