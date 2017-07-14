@@ -64,6 +64,20 @@ describe('utils', function() {
 		});
 	});
 
+	describe('::getIgnoredRegion', function() {
+		it('returns the region with the highest count', function() {
+			expect(utils.getIgnoredRegion({
+				foo: 1,
+				bar: 3,
+				baz: 2
+			})).to.equal('bar');
+		});
+
+		it('returns null if region counts are empty', function() {
+			expect(utils.getIgnoredRegion({})).to.be.null;
+		});
+	});
+
 	describe('::getMinimumCollisionScore', function() {
 		it('returns smallest possible collision score based on region counts and pool count', function() {
 			expect(utils.getMinimumCollisionScore({
