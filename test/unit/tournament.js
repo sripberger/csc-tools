@@ -3,8 +3,7 @@ const Tournament = require('../../lib/tournament');
 const { Individual } = require('gene-lib');
 const sinon = require('sinon');
 const RankList = require('../../lib/rank-list');
-const utils = require('../../lib/utils');
-const Pool = require('../../lib/pool');
+const PoolList = require('../../lib/pool-list');
 
 describe('Tournament', function() {
 	let sandbox;
@@ -39,69 +38,47 @@ describe('Tournament', function() {
 		expect(tournament.settings).to.deep.equal({});
 	});
 
-	describe('#getPools', function() {
+	describe('#getPoolList', function() {
 		it('arranges players into pools using utils::getPoolIndex', function() {
 			let rankList = new RankList();
 			let poolCount = 4;
 			let tournament = new Tournament(rankList, { poolCount });
-			sandbox.stub(rankList, 'seedOrder').returns({
+			let players = {
 				[Symbol.iterator]: function*() {
 					yield { tag: 'foo' };
 					yield { tag: 'bar' };
-					yield { tag: 'baz' };
-					yield { tag: 'qux' };
 				}
-			});
-			sandbox.stub(utils, 'getPoolIndex')
-				.withArgs(0, poolCount).returns(0)
-				.withArgs(1, poolCount).returns(1)
-				.withArgs(2, poolCount).returns(2)
-				.withArgs(3, poolCount).returns(2);
+			};
+			let poolList = new PoolList();
+			sandbox.stub(rankList, 'seedOrder').returns(players);
+			sandbox.stub(PoolList, 'create').returns(poolList);
 
-
-			let result = tournament.getPools();
+			let result = tournament.getPoolList();
 
 			expect(rankList.seedOrder).to.be.calledOnce;
 			expect(rankList.seedOrder).to.be.calledOn(rankList);
-			expect(utils.getPoolIndex).to.have.callCount(4);
-			expect(utils.getPoolIndex).to.always.be.calledOn(utils);
-			expect(utils.getPoolIndex).to.be.calledWith(0, poolCount);
-			expect(utils.getPoolIndex).to.be.calledWith(1, poolCount);
-			expect(utils.getPoolIndex).to.be.calledWith(2, poolCount);
-			expect(utils.getPoolIndex).to.be.calledWith(3, poolCount);
-			expect(result).to.be.an.instanceof(Array);
-			expect(result).to.have.length(poolCount);
-			expect(result[0]).to.be.an.instanceof(Pool);
-			expect(result[0].players).to.deep.equal([ { tag: 'foo' } ]);
-			expect(result[1]).to.be.an.instanceof(Pool);
-			expect(result[1].players).to.deep.equal([ { tag: 'bar' } ]);
-			expect(result[2]).to.be.an.instanceof(Pool);
-			expect(result[2].players).to.deep.equal([ { tag: 'baz' }, { tag: 'qux' } ]);
-			expect(result[3]).to.be.an.instanceof(Pool);
-			expect(result[3].players).to.deep.equal([]);
+			expect(PoolList.create).to.be.calledOnce;
+			expect(PoolList.create).to.be.calledOn(PoolList);
+			expect(PoolList.create).to.be.calledWith(players, poolCount);
+			expect(result).to.equal(poolList);
 		});
 	});
 
 	describe('#getCollisionScore', function() {
-		it('returns sum of collision scores from all pools', function() {
+		it('returns collision score from pool list', function() {
 			let ignoredRegion = 'baz';
-			let tournament = new Tournament([], { ignoredRegion });
-			let fooPool = new Pool([ { tag: 'foo' }]);
-			let barPool = new Pool([ { tag: 'bar' }]);
-			sandbox.stub(tournament, 'getPools').returns([ fooPool, barPool ]);
-			sandbox.stub(fooPool, 'getCollisionScore').returns(2);
-			sandbox.stub(barPool, 'getCollisionScore').returns(3);
+			let tournament = new Tournament(new RankList(), { ignoredRegion });
+			let poolList = new PoolList();
+			sinon.stub(tournament, 'getPoolList').returns(poolList);
+			sinon.stub(poolList, 'getCollisionScore').returns(5);
 
 			let result = tournament.getCollisionScore();
 
-			expect(tournament.getPools).to.be.calledOnce;
-			expect(tournament.getPools).to.be.calledOn(tournament);
-			expect(fooPool.getCollisionScore).to.be.calledOnce;
-			expect(fooPool.getCollisionScore).to.be.calledOn(fooPool);
-			expect(fooPool.getCollisionScore).to.be.calledWith(ignoredRegion);
-			expect(barPool.getCollisionScore).to.be.calledOnce;
-			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
-			expect(barPool.getCollisionScore).to.be.calledWith(ignoredRegion);
+			expect(tournament.getPoolList).to.be.calledOnce;
+			expect(tournament.getPoolList).to.be.calledOn(tournament);
+			expect(poolList.getCollisionScore).to.be.calledOnce;
+			expect(poolList.getCollisionScore).to.be.calledOn(poolList);
+			expect(poolList.getCollisionScore).to.be.calledWith(ignoredRegion);
 			expect(result).to.equal(5);
 		});
 	});
