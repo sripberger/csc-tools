@@ -44,9 +44,11 @@ describe('solveUtils', function() {
 			let players = [ { tag: 'foo' }, { tag: 'bar' } ];
 			let poolCount = 4;
 			let factory = function factory() {};
-			let solution = new Tournament();
+			let tournament = new Tournament();
+			let solution = [ { tag: 'baz' }, { tag: 'qux' } ];
 			sandbox.stub(solveUtils, 'getTournamentFactory').returns(factory);
-			sandbox.stub(geneLib, 'run').returns(solution);
+			sandbox.stub(geneLib, 'run').returns(tournament);
+			sandbox.stub(tournament, 'getPlayers').returns(solution);
 
 			let result = solveUtils.solve(players, poolCount);
 
@@ -63,6 +65,8 @@ describe('solveUtils', function() {
 				mutationRate: 0.05,
 				createIndividual: factory
 			});
+			expect(tournament.getPlayers).to.be.calledOnce;
+			expect(tournament.getPlayers).to.be.calledOn(tournament);
 			expect(result).to.equal(solution);
 		});
 	});
