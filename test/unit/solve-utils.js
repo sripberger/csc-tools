@@ -17,17 +17,21 @@ describe('solveUtils', function() {
 		sandbox.restore();
 	});
 
-	describe('::getTournamentFactory', function() {
-		it('returns bound TournamentGenerator::generateTournament', function() {
+	describe('::solve', function() {
+		it('runs genetic algorithm using gene-lib', function() {
 			let players = [ { tag: 'foo' }, { tag: 'bar' } ];
 			let poolCount = 4;
 			let generator = new TournamentGenerator();
 			let { generateTournament } = generator;
 			let factory = function factory() {};
+			let tournament = new Tournament();
+			let solution = [ { tag: 'baz' }, { tag: 'qux' } ];
 			sandbox.stub(TournamentGenerator, 'create').returns(generator);
 			sandbox.stub(generateTournament, 'bind').returns(factory);
+			sandbox.stub(geneLib, 'run').returns(tournament);
+			sandbox.stub(tournament, 'getPlayers').returns(solution);
 
-			let result = solveUtils.getTournamentFactory(players, poolCount);
+			let result = solveUtils.solve(players, poolCount);
 
 			expect(TournamentGenerator.create).to.be.calledOnce;
 			expect(TournamentGenerator.create).to.be.calledOn(TournamentGenerator);
@@ -35,29 +39,6 @@ describe('solveUtils', function() {
 			expect(generateTournament.bind).to.be.calledOnce;
 			expect(generateTournament.bind).to.be.calledOn(generateTournament);
 			expect(generateTournament.bind).to.be.calledWith(generator);
-			expect(result).to.equal(factory);
-		});
-	});
-
-	describe('::solve', function() {
-		it('runs genetic algorithm using gene-lib', function() {
-			let players = [ { tag: 'foo' }, { tag: 'bar' } ];
-			let poolCount = 4;
-			let factory = function factory() {};
-			let tournament = new Tournament();
-			let solution = [ { tag: 'baz' }, { tag: 'qux' } ];
-			sandbox.stub(solveUtils, 'getTournamentFactory').returns(factory);
-			sandbox.stub(geneLib, 'run').returns(tournament);
-			sandbox.stub(tournament, 'getPlayers').returns(solution);
-
-			let result = solveUtils.solve(players, poolCount);
-
-			expect(solveUtils.getTournamentFactory).to.be.calledOnce;
-			expect(solveUtils.getTournamentFactory).to.be.calledOn(solveUtils);
-			expect(solveUtils.getTournamentFactory).to.be.calledWith(
-				players,
-				poolCount
-			);
 			expect(geneLib.run).to.be.calledOnce;
 			expect(geneLib.run).to.be.calledOn(geneLib);
 			expect(geneLib.run).to.be.calledWith({
