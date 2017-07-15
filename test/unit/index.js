@@ -1,4 +1,4 @@
-const solveUtils = require('../../lib/solve-utils');
+const cscTools = require('../../lib');
 const sinon = require('sinon');
 const geneLib = require('gene-lib');
 const TournamentGenerator = require('../../lib/tournament-generator');
@@ -6,7 +6,7 @@ const Tournament = require('../../lib/tournament');
 const PoolList = require('../../lib/pool-list');
 const utils = require('../../lib/utils');
 
-describe('solveUtils', function() {
+describe('index', function() {
 	let sandbox;
 
 	beforeEach(function() {
@@ -30,7 +30,7 @@ describe('solveUtils', function() {
 			sandbox.stub(poolList, 'getCollisionScore').returns(5);
 			sandbox.stub(utils, 'getMinimumCollisionScore').returns(4);
 
-			let result = solveUtils.analyze(players, poolCount);
+			let result = cscTools.analyze(players, poolCount);
 
 			expect(utils.getRegionCounts).to.be.calledOnce;
 			expect(utils.getRegionCounts).to.be.calledOn(utils);
@@ -74,7 +74,7 @@ describe('solveUtils', function() {
 			sandbox.stub(geneLib, 'run').returns(tournament);
 			sandbox.stub(tournament, 'getPlayers').returns(solution);
 
-			let result = solveUtils.solve(players, poolCount);
+			let result = cscTools.solve(players, poolCount);
 
 			expect(TournamentGenerator.create).to.be.calledOnce;
 			expect(TournamentGenerator.create).to.be.calledOn(TournamentGenerator);
