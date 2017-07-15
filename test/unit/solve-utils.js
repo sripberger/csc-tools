@@ -71,15 +71,20 @@ describe('solveUtils', function() {
 		});
 	});
 
-	describe('::getIgnoredRegion', function() {
-		it('returns ignored region for a player array', function() {
+	describe('::analyze', function() {
+		it('returns analysis of provided player array', function() {
 			let players = [ { tag: 'dude' }, { tag: 'bro' } ];
+			let poolCount = 4;
 			let regionCounts = { foo: 1, bar: 2 };
-			let ignoredRegion = 'ignoredRegion';
+			let ignoredRegion = 'ignored region';
+			let poolList = new PoolList();
 			sandbox.stub(utils, 'getRegionCounts').returns(regionCounts);
 			sandbox.stub(utils, 'getIgnoredRegion').returns(ignoredRegion);
+			sandbox.stub(PoolList, 'create').returns(poolList);
+			sandbox.stub(poolList, 'getCollisionScore').returns(5);
+			sandbox.stub(utils, 'getMinimumCollisionScore').returns(4);
 
-			let result = solveUtils.getIgnoredRegion(players);
+			let result = solveUtils.analyze(players, poolCount);
 
 			expect(utils.getRegionCounts).to.be.calledOnce;
 			expect(utils.getRegionCounts).to.be.calledOn(utils);
@@ -87,53 +92,12 @@ describe('solveUtils', function() {
 			expect(utils.getIgnoredRegion).to.be.calledOnce;
 			expect(utils.getIgnoredRegion).to.be.calledOn(utils);
 			expect(utils.getIgnoredRegion).to.be.calledWith(regionCounts);
-			expect(result).to.equal(ignoredRegion);
-		});
-	});
-
-	describe('::getCollisionScore', function() {
-		it('returns the collision score of a player array', function() {
-			let players = [ { tag: 'dude' }, { tag: 'bro' } ];
-			let poolCount = 4;
-			let ignoredRegion = 'ignored region';
-			let poolList = new PoolList();
-			sandbox.stub(solveUtils, 'getIgnoredRegion').returns(ignoredRegion);
-			sandbox.stub(PoolList, 'create').returns(poolList);
-			sandbox.stub(poolList, 'getCollisionScore').returns(5);
-
-			let result = solveUtils.getCollisionScore(players, poolCount);
-
-			expect(solveUtils.getIgnoredRegion).to.be.calledOnce;
-			expect(solveUtils.getIgnoredRegion).to.be.calledOn(solveUtils);
-			expect(solveUtils.getIgnoredRegion).to.be.calledWith(players);
 			expect(PoolList.create).to.be.calledOnce;
 			expect(PoolList.create).to.be.calledOn(PoolList);
 			expect(PoolList.create).to.be.calledWith(players, poolCount);
 			expect(poolList.getCollisionScore).to.be.calledOnce;
 			expect(poolList.getCollisionScore).to.be.calledOn(poolList);
 			expect(poolList.getCollisionScore).to.be.calledWith(ignoredRegion);
-			expect(result).to.equal(5);
-		});
-	});
-
-	describe('::getMinimumCollisionScore', function() {
-		it('returns the minimum collision score of a player array', function() {
-			let players = [ { tag: 'dude' }, { tag: 'bro' } ];
-			let poolCount = 4;
-			let regionCounts = { foo: 1, bar: 2 };
-			let ignoredRegion = 'ignored region';
-			sandbox.stub(utils, 'getRegionCounts').returns(regionCounts);
-			sandbox.stub(solveUtils, 'getIgnoredRegion').returns(ignoredRegion);
-			sandbox.stub(utils, 'getMinimumCollisionScore').returns(4);
-
-			let result = solveUtils.getMinimumCollisionScore(players, poolCount);
-
-			expect(utils.getRegionCounts).to.be.calledOnce;
-			expect(utils.getRegionCounts).to.be.calledOn(utils);
-			expect(utils.getRegionCounts).to.be.calledWith(players);
-			expect(solveUtils.getIgnoredRegion).to.be.calledOnce;
-			expect(solveUtils.getIgnoredRegion).to.be.calledOn(solveUtils);
-			expect(solveUtils.getIgnoredRegion).to.be.calledWith(players);
 			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
 			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
 			expect(utils.getMinimumCollisionScore).to.be.calledWith(
@@ -141,7 +105,12 @@ describe('solveUtils', function() {
 				poolCount,
 				ignoredRegion
 			);
-			expect(result).to.equal(4);
+			expect(result).to.deep.equal({
+				regionCounts,
+				ignoredRegion,
+				collisionScore: 5,
+				minimumCollisionScore: 4
+			});
 		});
 	});
 });
