@@ -17,41 +17,6 @@ describe('solveUtils', function() {
 		sandbox.restore();
 	});
 
-	describe('::solve', function() {
-		it('runs genetic algorithm using gene-lib', function() {
-			let players = [ { tag: 'foo' }, { tag: 'bar' } ];
-			let poolCount = 4;
-			let generator = new TournamentGenerator();
-			let { generateTournament } = generator;
-			let factory = function factory() {};
-			let tournament = new Tournament();
-			let solution = [ { tag: 'baz' }, { tag: 'qux' } ];
-			sandbox.stub(TournamentGenerator, 'create').returns(generator);
-			sandbox.stub(generateTournament, 'bind').returns(factory);
-			sandbox.stub(geneLib, 'run').returns(tournament);
-			sandbox.stub(tournament, 'getPlayers').returns(solution);
-
-			let result = solveUtils.solve(players, poolCount);
-
-			expect(TournamentGenerator.create).to.be.calledOnce;
-			expect(TournamentGenerator.create).to.be.calledOn(TournamentGenerator);
-			expect(TournamentGenerator.create).to.be.calledWith(players, poolCount);
-			expect(generateTournament.bind).to.be.calledOnce;
-			expect(generateTournament.bind).to.be.calledOn(generateTournament);
-			expect(generateTournament.bind).to.be.calledWith(generator);
-			expect(geneLib.run).to.be.calledOnce;
-			expect(geneLib.run).to.be.calledOn(geneLib);
-			expect(geneLib.run).to.be.calledWith({
-				crossoverRate: 0.2,
-				mutationRate: 0.05,
-				createIndividual: factory
-			});
-			expect(tournament.getPlayers).to.be.calledOnce;
-			expect(tournament.getPlayers).to.be.calledOn(tournament);
-			expect(result).to.equal(solution);
-		});
-	});
-
 	describe('::analyze', function() {
 		it('returns analysis of provided player array', function() {
 			let players = [ { tag: 'dude' }, { tag: 'bro' } ];
@@ -92,6 +57,41 @@ describe('solveUtils', function() {
 				collisionScore: 5,
 				minimumCollisionScore: 4
 			});
+		});
+	});
+
+	describe('::solve', function() {
+		it('runs genetic algorithm using gene-lib', function() {
+			let players = [ { tag: 'foo' }, { tag: 'bar' } ];
+			let poolCount = 4;
+			let generator = new TournamentGenerator();
+			let { generateTournament } = generator;
+			let factory = function factory() {};
+			let tournament = new Tournament();
+			let solution = [ { tag: 'baz' }, { tag: 'qux' } ];
+			sandbox.stub(TournamentGenerator, 'create').returns(generator);
+			sandbox.stub(generateTournament, 'bind').returns(factory);
+			sandbox.stub(geneLib, 'run').returns(tournament);
+			sandbox.stub(tournament, 'getPlayers').returns(solution);
+
+			let result = solveUtils.solve(players, poolCount);
+
+			expect(TournamentGenerator.create).to.be.calledOnce;
+			expect(TournamentGenerator.create).to.be.calledOn(TournamentGenerator);
+			expect(TournamentGenerator.create).to.be.calledWith(players, poolCount);
+			expect(generateTournament.bind).to.be.calledOnce;
+			expect(generateTournament.bind).to.be.calledOn(generateTournament);
+			expect(generateTournament.bind).to.be.calledWith(generator);
+			expect(geneLib.run).to.be.calledOnce;
+			expect(geneLib.run).to.be.calledOn(geneLib);
+			expect(geneLib.run).to.be.calledWith({
+				crossoverRate: 0.2,
+				mutationRate: 0.05,
+				createIndividual: factory
+			});
+			expect(tournament.getPlayers).to.be.calledOnce;
+			expect(tournament.getPlayers).to.be.calledOn(tournament);
+			expect(result).to.equal(solution);
 		});
 	});
 });
