@@ -32,7 +32,7 @@ describe('RankList', function() {
 		expect(rankList.ranks).to.deep.equal([]);
 	});
 
-	describe('::create', function() {
+	describe.only('::create', function() {
 		it('returns a RankList populated with provided player list', function() {
 			let players = [
 				{ tag: 'a', rank: 1 },
@@ -41,14 +41,15 @@ describe('RankList', function() {
 				{ tag: 'd', rank: 2 },
 				{ tag: 'e', rank: 1.5 },
 				{ tag: 'f', rank: 1.5 },
-				{ tag: 'g', rank: 1 }
+				{ tag: 'g', rank: 1 },
+				{ tag: 'h', rank: 10 }
 			];
 
 			let result = RankList.create(players);
 
 			expect(result).to.be.an.instanceof(RankList);
 			expect(result.ranks).to.be.an.instanceof(Array);
-			expect(result.ranks).to.have.length(3);
+			expect(result.ranks).to.have.length(4);
 			expect(result.ranks[0]).to.be.an.instanceof(Rank);
 			expect(result.ranks[0].players).to.deep.equal([
 				players[0],
@@ -64,6 +65,10 @@ describe('RankList', function() {
 			expect(result.ranks[2].players).to.deep.equal([
 				players[2],
 				players[3]
+			]);
+			expect(result.ranks[3]).to.be.an.instanceof(Rank);
+			expect(result.ranks[3].players).to.deep.equal([
+				players[7]
 			]);
 		});
 	});
