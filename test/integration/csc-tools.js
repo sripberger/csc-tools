@@ -27,10 +27,9 @@ describe('csc-tools', function() {
 	describe('::solve', function() {
 		it('minimizes regional collisions in pools', function() {
 			let solution = cscTools.solve(csc5Players, poolCount);
-			let { collisionScore, minimumCollisionScore } =
-				cscTools.analyze(solution, poolCount);
+			let { collisionScore } = cscTools.analyze(solution, poolCount);
 
-			expect(collisionScore).to.equal(minimumCollisionScore);
+			expect(collisionScore).to.equal(4);
 		});
 	});
 });

@@ -32,7 +32,7 @@ describe('RankList', function() {
 		expect(rankList.ranks).to.deep.equal([]);
 	});
 
-	describe.only('::create', function() {
+	describe('::create', function() {
 		it('returns a RankList populated with provided player list', function() {
 			let players = [
 				{ tag: 'a', rank: 1 },
