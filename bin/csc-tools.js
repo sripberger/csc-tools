@@ -36,7 +36,10 @@ program
 program
 	.command('analyze <poolCount> [path]')
 	.alias('a')
-	.action((poolCount, inputPath) => {
+	.description('analyze a player list')
+	.option('-r, --show-region-counts', 'Show region counts')
+	.option('-p, --show-pools', 'Show pools')
+	.action((poolCount, inputPath, options) => {
 		poolCount = parsePoolCount(poolCount);
 		getPlayers(inputPath)
 			.then((players) => {
@@ -48,32 +51,37 @@ program
 					value
 				]);
 				let regionCountRows = _.map(regionCounts, (count, region) => [
-					colors.cyan(`    ${region}:`),
+					colors.cyan(`${region}:`),
 					count
 				]);
 
 				console.log(cliff.stringifyRows(baseRows));
-				console.log(colors.cyan('\nregionCounts:'));
-				console.log(cliff.stringifyRows(regionCountRows));
 
-				pools.forEach((pool, index) => {
-					let { players, collisionScore } = pool;
-					let poolLabel = colors.yellow.underline(`Pool ${index}`);
-					let scoreStr = `(collisionScore: ${collisionScore})`;
-					let playerTable = cliff.stringifyObjectRows(
-						players,
-						[ 'tag', 'region' ],
-						[ 'cyan', 'cyan' ]
-					);
+				if (options.showRegionCounts) {
+					console.log(colors.yellow.underline('\nRegion Counts'));
+					console.log(cliff.stringifyRows(regionCountRows));
+				}
 
-					if (collisionScore > 0) {
-						scoreStr = colors.red(scoreStr);
-					} else {
-						scoreStr = colors.green(scoreStr);
-					}
+				if (options.showPools) {
+					pools.forEach((pool, index) => {
+						let { players, collisionScore } = pool;
+						let poolLabel = colors.yellow.underline(`Pool ${index}`);
+						let scoreStr = `(collisionScore: ${collisionScore})`;
+						let playerTable = cliff.stringifyObjectRows(
+							players,
+							[ 'tag', 'region' ],
+							[ 'cyan', 'cyan' ]
+						);
 
-					console.log(`\n${poolLabel} ${scoreStr}\n${playerTable}`);
-				});
+						if (collisionScore > 0) {
+							scoreStr = colors.red(scoreStr);
+						} else {
+							scoreStr = colors.green(scoreStr);
+						}
+
+						console.log(`\n${poolLabel} ${scoreStr}\n${playerTable}`);
+					});
+				}
 			})
 			.catch((err) => {
 				console.error(err);
@@ -84,6 +92,7 @@ program
 program
 	.command('solve <poolCount> [path]')
 	.alias('s')
+	.description('minimize regional collisions in a player list')
 	.action((poolCount, inputPath) => {
 		poolCount = parsePoolCount(poolCount);
 		getPlayers(inputPath)
