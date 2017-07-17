@@ -1,5 +1,6 @@
 const cscTools = require('../../lib');
 const sinon = require('sinon');
+const _ = require('lodash');
 const geneLib = require('gene-lib');
 const TournamentGenerator = require('../../lib/tournament-generator');
 const Tournament = require('../../lib/tournament');
@@ -18,20 +19,25 @@ describe('index', function() {
 	});
 
 	describe('::analyze', function() {
-		it('returns analysis of provided player array', function() {
-			let players = [ { tag: 'dude' }, { tag: 'bro' } ];
-			let poolCount = 4;
-			let regionCounts = { foo: 1, bar: 2 };
-			let ignoredRegion = 'ignored region';
-			let poolList = new PoolList();
+		const poolCount = 4;
+		const ignoredRegion = 'ignored region';
+		let players, regionCounts, poolList, result;
+
+		beforeEach(function() {
+			players = [ { tag: 'dude' }, { tag: 'bro' } ];
+			regionCounts = { foo: 2, bar: 3, baz: 1, asdf: 1 };
+			poolList = new PoolList();
+
 			sandbox.stub(utils, 'getRegionCounts').returns(regionCounts);
 			sandbox.stub(utils, 'getIgnoredRegion').returns(ignoredRegion);
 			sandbox.stub(PoolList, 'create').returns(poolList);
 			sandbox.stub(poolList, 'getCollisionScore').returns(5);
 			sandbox.stub(utils, 'getMinimumCollisionScore').returns(4);
 
-			let result = cscTools.analyze(players, poolCount);
+			result = cscTools.analyze(players, poolCount);
+		});
 
+		it('returns analysis of provided player array', function() {
 			expect(utils.getRegionCounts).to.be.calledOnce;
 			expect(utils.getRegionCounts).to.be.calledOn(utils);
 			expect(utils.getRegionCounts).to.be.calledWith(players);
@@ -52,11 +58,26 @@ describe('index', function() {
 				ignoredRegion
 			);
 			expect(result).to.deep.equal({
-				regionCounts,
-				ignoredRegion,
 				collisionScore: 5,
-				minimumCollisionScore: 4
+				minimumCollisionScore: 4,
+				ignoredRegion,
+				regionCounts
 			});
+		});
+
+		it('sorts keys appropriately for output', function() {
+			expect(_.keys(result)).to.deep.equal([
+				'collisionScore',
+				'minimumCollisionScore',
+				'ignoredRegion',
+				'regionCounts'
+			]);
+			expect(_.keys(result.regionCounts)).to.deep.equal([
+				'bar',
+				'foo',
+				'asdf',
+				'baz'
+			]);
 		});
 	});
 
