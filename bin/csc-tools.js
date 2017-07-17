@@ -5,7 +5,8 @@ const program = require('commander');
 const getStdin = require('get-stdin');
 const path = require('path');
 const pify = require('pify');
-const prettyjson = require('prettyjson');
+const colors = require('colors');
+const cliff = require('cliff');
 const readFile = pify(require('fs').readFile);
 const csvParse = pify(require('csv-parse'));
 const csvStringify = pify(require('csv-stringify'));
@@ -40,7 +41,39 @@ program
 		getPlayers(inputPath)
 			.then((players) => {
 				let analysis = cscTools.analyze(players, poolCount);
-				console.log(prettyjson.render(analysis));
+				let base = _.omit(analysis, [ 'pools', 'regionCounts' ]);
+				let { pools, regionCounts } = analysis;
+				let baseRows = _.map(base, (value, key) => [
+					colors.cyan(`${key}:`),
+					value
+				]);
+				let regionCountRows = _.map(regionCounts, (count, region) => [
+					colors.cyan(`    ${region}:`),
+					count
+				]);
+
+				console.log(cliff.stringifyRows(baseRows));
+				console.log(colors.cyan('\nregionCounts:'));
+				console.log(cliff.stringifyRows(regionCountRows));
+
+				pools.forEach((pool, index) => {
+					let { players, collisionScore } = pool;
+					let poolLabel = colors.yellow.underline(`Pool ${index}`);
+					let scoreStr = `(collisionScore: ${collisionScore})`;
+					let playerTable = cliff.stringifyObjectRows(
+						players,
+						[ 'tag', 'region' ],
+						[ 'cyan', 'cyan' ]
+					);
+
+					if (collisionScore > 0) {
+						scoreStr = colors.red(scoreStr);
+					} else {
+						scoreStr = colors.green(scoreStr);
+					}
+
+					console.log(`\n${poolLabel} ${scoreStr}\n${playerTable}`);
+				});
 			})
 			.catch((err) => {
 				console.error(err);
