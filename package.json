@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Tools for Cincinnati Smash Classic",
   "main": "index.js",
+  "bin": {
+	  "csc-tools": "./bin/csc-tools.js"
+  },
   "scripts": {
     "lint": "eslint . || exit 0",
     "unit": "mocha ./test/setup.js ./test/unit --recursive -R spec || exit 0",
@@ -19,6 +22,12 @@
     "sinon-chai": "^2.10.0"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "commander": "^2.11.0",
+    "csv-parse": "^1.2.0",
+    "csv-stringify": "^1.0.4",
+    "get-stdin": "^5.0.1",
+    "lodash": "^4.17.4",
+    "pify": "^3.0.0",
+    "prettyjson": "^1.2.1"
   }
 }
