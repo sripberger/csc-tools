@@ -21,17 +21,19 @@ describe('index', function() {
 	describe('::analyze', function() {
 		const poolCount = 4;
 		const ignoredRegion = 'ignored region';
-		let players, regionCounts, poolList, result;
+		let players, regionCounts, poolList, poolAnalysis, result;
 
 		beforeEach(function() {
 			players = [ { tag: 'dude' }, { tag: 'bro' } ];
 			regionCounts = { foo: 2, bar: 3, baz: 1, asdf: 1 };
 			poolList = new PoolList();
+			poolAnalysis = [ { pool: 1 }, { pool: 2 } ];
 
 			sandbox.stub(utils, 'getRegionCounts').returns(regionCounts);
 			sandbox.stub(utils, 'getIgnoredRegion').returns(ignoredRegion);
 			sandbox.stub(PoolList, 'create').returns(poolList);
 			sandbox.stub(poolList, 'getCollisionScore').returns(5);
+			sandbox.stub(poolList, 'analyzePools').returns(poolAnalysis);
 			sandbox.stub(utils, 'getMinimumCollisionScore').returns(4);
 
 			result = cscTools.analyze(players, poolCount);
@@ -50,6 +52,9 @@ describe('index', function() {
 			expect(poolList.getCollisionScore).to.be.calledOnce;
 			expect(poolList.getCollisionScore).to.be.calledOn(poolList);
 			expect(poolList.getCollisionScore).to.be.calledWith(ignoredRegion);
+			expect(poolList.analyzePools).to.be.calledOnce;
+			expect(poolList.analyzePools).to.be.calledOn(poolList);
+			expect(poolList.analyzePools).to.be.calledWith(ignoredRegion);
 			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
 			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
 			expect(utils.getMinimumCollisionScore).to.be.calledWith(
@@ -61,7 +66,8 @@ describe('index', function() {
 				collisionScore: 5,
 				minimumCollisionScore: 4,
 				ignoredRegion,
-				regionCounts
+				regionCounts,
+				pools: poolAnalysis
 			});
 		});
 
@@ -70,7 +76,8 @@ describe('index', function() {
 				'collisionScore',
 				'minimumCollisionScore',
 				'ignoredRegion',
-				'regionCounts'
+				'regionCounts',
+				'pools'
 			]);
 			expect(_.keys(result.regionCounts)).to.deep.equal([
 				'bar',

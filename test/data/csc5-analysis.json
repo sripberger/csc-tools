@@ -1,0 +1,219 @@
+{
+	"collisionScore": 13,
+	"minimumCollisionScore": 4,
+	"ignoredRegion": "Cincinnati",
+	"regionCounts": {
+		"Cincinnati": 64,
+		"Columbus": 20,
+		"Dayton": 14,
+		"Kentucky": 9,
+		"NEOH": 8,
+		"Indiana": 4,
+		"Pittsburgh": 2,
+		"Colorado": 1
+	},
+	"pools": [
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": "Hanky Panky", "rank": 1, "region": "Columbus" },
+				{ "tag": "Biff$$$$", "rank": 7, "region": "Cincinnati" },
+				{ "tag": "Decaf", "rank": 7, "region": "Dayton" },
+				{ "tag": "Windex", "rank": 10, "region": "Cincinnati" },
+				{ "tag": "Grognar", "rank": 10, "region": "Kentucky" },
+				{ "tag": "Caveman?", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "SirJay", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 1,
+			"players": [
+				{ "tag": "Drephen", "rank": 2, "region": "Columbus" },
+				{ "tag": "Ecco", "rank": 7, "region": "Kentucky" },
+				{ "tag": "Varkid", "rank": 7, "region": "Kentucky" },
+				{ "tag": "Sapoc", "rank": 10, "region": "NEOH" },
+				{ "tag": "Kidbuu42", "rank": 10, "region": "Cincinnati" },
+				{ "tag": "Syn", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "hankykang", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": "Fizzle_Boy", "rank": 2.5, "region": "Columbus" },
+				{ "tag": "I-19", "rank": 6.5, "region": "Cincinnati" },
+				{ "tag": "Dunx", "rank": 7, "region": "Cincinnati" },
+				{ "tag": "Giggitywywy", "rank": 10, "region": "Kentucky" },
+				{ "tag": "Treadwell", "rank": 10, "region": "NEOH" },
+				{ "tag": "Unit", "rank": 12, "region": "Dayton" },
+				{ "tag": "snakemaster777", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 1,
+			"players": [
+				{ "tag": "Amida", "rank": 3, "region": "Kentucky" },
+				{ "tag": "Sneker", "rank": 6.5, "region": "Dayton" },
+				{ "tag": "Plautus", "rank": 8, "region": "Cincinnati" },
+				{ "tag": "stringbean", "rank": 10, "region": "Cincinnati" },
+				{ "tag": "Get Loose", "rank": 11, "region": "Columbus" },
+				{ "tag": "CloneArmy", "rank": 12, "region": "Dayton" },
+				{ "tag": "Evil Lord Goomy", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 1,
+			"players": [
+				{ "tag": "TheRealThing", "rank": 3, "region": "NEOH" },
+				{ "tag": "BY15", "rank": 6.5, "region": "Columbus" },
+				{ "tag": "Cablebox", "rank": 8, "region": "Columbus" },
+				{ "tag": "Costanza", "rank": 10, "region": "Kentucky" },
+				{ "tag": "redxparasite", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "sk_comb0", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "Korova", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 1,
+			"players": [
+				{ "tag": "Papa", "rank": 3.5, "region": "Columbus" },
+				{ "tag": "Halfjack", "rank": 6.5, "region": "Cincinnati" },
+				{ "tag": "Ogie", "rank": 8, "region": "Kentucky" },
+				{ "tag": "Wolven", "rank": 10, "region": "Kentucky" },
+				{ "tag": "Raws", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Voodoo", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "Loaf", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 2,
+			"players": [
+				{ "tag": "Snap", "rank": 3.5, "region": "Cincinnati" },
+				{ "tag": "Signd0g", "rank": 6, "region": "Dayton" },
+				{ "tag": "notMitch", "rank": 8, "region": "Columbus" },
+				{ "tag": "Danbo", "rank": 10, "region": "Cincinnati" },
+				{ "tag": "Black Knight", "rank": 11, "region": "Columbus" },
+				{ "tag": "Knack", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Christ Himself", "rank": 12, "region": "Dayton" },
+				{ "tag": "Pants", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": ".Ðempt", "rank": 3.5, "region": "NEOH" },
+				{ "tag": "Clef", "rank": 6, "region": "Cincinnati" },
+				{ "tag": "Dirac", "rank": 8, "region": "Cincinnati" },
+				{ "tag": "CPU?", "rank": 10, "region": "Indiana" },
+				{ "tag": "SunWalker", "rank": 11, "region": "Columbus" },
+				{ "tag": "Lt. Dan", "rank": 11, "region": "Dayton" },
+				{ "tag": "Bananzeo", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "17 in the Stink", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": "FEAR", "rank": 4, "region": "Cincinnati" },
+				{ "tag": "DerfMidWest", "rank": 6, "region": "NEOH" },
+				{ "tag": "Seeze", "rank": 8, "region": "Columbus" },
+				{ "tag": "Blahguy", "rank": 10, "region": "Indiana" },
+				{ "tag": "Chef", "rank": 11, "region": "Dayton" },
+				{ "tag": "Reed", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Zsalz", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "wolfboat", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": "Sephy", "rank": 4, "region": "Cincinnati" },
+				{ "tag": "EGJ", "rank": 6, "region": "NEOH" },
+				{ "tag": "Vanbro", "rank": 8, "region": "Colorado" },
+				{ "tag": "KittheShadow", "rank": 10, "region": "Indiana" },
+				{ "tag": "M7", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Highwalker", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Tupps", "rank": 12, "region": "Columbus" },
+				{ "tag": "Cool Beans", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 1,
+			"players": [
+				{ "tag": "Fooly", "rank": 4.5, "region": "Columbus" },
+				{ "tag": "Megachuk", "rank": 5.5, "region": "Cincinnati" },
+				{ "tag": "Russy", "rank": 9, "region": "Cincinnati" },
+				{ "tag": "SweetDee", "rank": 10, "region": "Indiana" },
+				{ "tag": "Crawshaw", "rank": 11, "region": "Columbus" },
+				{ "tag": "NightPoster", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Straight Dave", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "D.E.", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": "Team Nick", "rank": 4.5, "region": "Cincinnati" },
+				{ "tag": "Ted", "rank": 5.5, "region": "Cincinnati" },
+				{ "tag": "Doppler12", "rank": 9, "region": "Dayton" },
+				{ "tag": "Rizner", "rank": 9, "region": "Cincinnati" },
+				{ "tag": "Fluidity", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Atlas", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "legendpttrx", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "Fox Jeffworthy", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 3,
+			"players": [
+				{ "tag": "Gemini", "rank": 5, "region": "Dayton" },
+				{ "tag": "Suidt", "rank": 5.5, "region": "Cincinnati" },
+				{ "tag": "Huckleberry Dog", "rank": 9, "region": "Dayton" },
+				{ "tag": "StoneyB", "rank": 9, "region": "Cincinnati" },
+				{ "tag": "Status", "rank": 11, "region": "Columbus" },
+				{ "tag": "Ark", "rank": 11, "region": "Dayton" },
+				{ "tag": "smoke", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "SkellytanMan", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 2,
+			"players": [
+				{ "tag": "Deep Fox", "rank": 5, "region": "Columbus" },
+				{ "tag": "Jerry", "rank": 5.5, "region": "Dayton" },
+				{ "tag": "JiP", "rank": 9, "region": "Pittsburgh" },
+				{ "tag": "Muff", "rank": 9, "region": "Pittsburgh" },
+				{ "tag": "EmceeCurtis", "rank": 11, "region": "Columbus" },
+				{ "tag": "Crispy", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Rachoi", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "MC", "rank": 12, "region": "Cincinnati" }
+			]
+		},
+		{
+			"collisionScore": 1,
+			"players": [
+				{ "tag": "toastyb", "rank": 5, "region": "Cincinnati" },
+				{ "tag": "Village Mascot", "rank": 5.5, "region": "Cincinnati" },
+				{ "tag": "JDbrawls", "rank": 9, "region": "Cincinnati" },
+				{ "tag": "Freky", "rank": 9, "region": "NEOH" },
+				{ "tag": "GibS", "rank": 11, "region": "Columbus" },
+				{ "tag": "JonnyLots", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "ShredderN64", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "J-Matt", "rank": 12, "region": "Columbus" }
+			]
+		},
+		{
+			"collisionScore": 0,
+			"players": [
+				{ "tag": "Ralis", "rank": 5, "region": "NEOH" },
+				{ "tag": "Cob", "rank": 5, "region": "Kentucky" },
+				{ "tag": "Simian", "rank": 9, "region": "Dayton" },
+				{ "tag": "sweetness", "rank": 9, "region": "Cincinnati" },
+				{ "tag": "Tking", "rank": 11, "region": "Cincinnati" },
+				{ "tag": "Xanmor", "rank": 11, "region": "Columbus" },
+				{ "tag": "Busta", "rank": 12, "region": "Cincinnati" },
+				{ "tag": "Sh4ggy", "rank": 12, "region": "Cincinnati" }
+			]
+		}
+	]
+}

@@ -75,7 +75,7 @@ describe('PoolList', function() {
 			let fooPool = new Pool([ { tag: 'foo' }]);
 			let barPool = new Pool([ { tag: 'bar' }]);
 			let poolList = new PoolList([ fooPool, barPool ]);
-			let ignoredRegion = 'baz';
+			let ignoredRegion = 'ignored region';
 			sinon.stub(fooPool, 'getCollisionScore').returns(2);
 			sinon.stub(barPool, 'getCollisionScore').returns(3);
 
@@ -88,6 +88,30 @@ describe('PoolList', function() {
 			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
 			expect(barPool.getCollisionScore).to.be.calledWith(ignoredRegion);
 			expect(result).to.equal(5);
+		});
+	});
+
+	describe('#analyzePools', function() {
+		it('returns collision score and player list from each pool', function() {
+			let fooPool = new Pool([ { tag: 'foo' }]);
+			let barPool = new Pool([ { tag: 'bar' }]);
+			let poolList = new PoolList([ fooPool, barPool ]);
+			let ignoredRegion = 'ignored region';
+			sinon.stub(fooPool, 'getCollisionScore').returns(2);
+			sinon.stub(barPool, 'getCollisionScore').returns(3);
+
+			let result = poolList.analyzePools(ignoredRegion);
+
+			expect(fooPool.getCollisionScore).to.be.calledOnce;
+			expect(fooPool.getCollisionScore).to.be.calledOn(fooPool);
+			expect(fooPool.getCollisionScore).to.be.calledWith(ignoredRegion);
+			expect(barPool.getCollisionScore).to.be.calledOnce;
+			expect(barPool.getCollisionScore).to.be.calledOn(barPool);
+			expect(barPool.getCollisionScore).to.be.calledWith(ignoredRegion);
+			expect(result).to.deep.equal([
+				{ collisionScore: 2, players: fooPool.players },
+				{ collisionScore: 3, players: barPool.players }
+			]);
 		});
 	});
 });
