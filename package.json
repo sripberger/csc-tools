@@ -2,7 +2,7 @@
   "name": "csc-tools",
   "version": "0.0.1",
   "description": "Tools for Cincinnati Smash Classic",
-  "main": "index.js",
+  "main": "lib/index.js",
   "bin": {
     "csc-tools": "./bin/csc-tools.js"
   },
