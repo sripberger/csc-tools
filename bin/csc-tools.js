@@ -65,7 +65,7 @@ program
 				if (options.showPools) {
 					pools.forEach((pool, index) => {
 						let { players, collisionScore } = pool;
-						let poolLabel = colors.yellow.underline(`Pool ${index}`);
+						let poolLabel = colors.yellow.underline(`Pool ${index + 1}`);
 						let scoreStr = `(collisionScore: ${collisionScore})`;
 						let playerTable = cliff.stringifyObjectRows(
 							players,
