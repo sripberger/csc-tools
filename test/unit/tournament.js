@@ -62,19 +62,23 @@ describe('Tournament', function() {
 	});
 
 	describe('#getPoolList', function() {
-		it('arranges players into pools using utils::getPoolIndex', function() {
-			let rankList = new RankList();
-			let poolCount = 4;
-			let tournament = new Tournament(rankList, { poolCount });
-			let players = {
-				[Symbol.iterator]: function*() {
-					yield { tag: 'foo' };
-					yield { tag: 'bar' };
-				}
-			};
-			let poolList = new PoolList();
+		let rankList, players, poolList;
+
+		beforeEach(function() {
+			rankList = new RankList();
+			players = { [Symbol.iterator]: function*() {
+				yield { tag: 'foo' };
+				yield { tag: 'bar' };
+			} };
+			poolList = new PoolList();
+
 			sandbox.stub(rankList, 'seedOrder').returns(players);
 			sandbox.stub(PoolList, 'create').returns(poolList);
+		});
+
+		it('arranges players into pools using utils::getPoolIndex', function() {
+			let poolCount = 4;
+			let tournament = new Tournament(rankList, { poolCount });
 
 			let result = tournament.getPoolList();
 
@@ -83,6 +87,19 @@ describe('Tournament', function() {
 			expect(PoolList.create).to.be.calledOnce;
 			expect(PoolList.create).to.be.calledOn(PoolList);
 			expect(PoolList.create).to.be.calledWith(players, poolCount);
+			expect(result).to.equal(poolList);
+		});
+
+		it('uses default poolCount of 1', function() {
+			let tournament = new Tournament(rankList);
+
+			let result = tournament.getPoolList();
+
+			expect(rankList.seedOrder).to.be.calledOnce;
+			expect(rankList.seedOrder).to.be.calledOn(rankList);
+			expect(PoolList.create).to.be.calledOnce;
+			expect(PoolList.create).to.be.calledOn(PoolList);
+			expect(PoolList.create).to.be.calledWith(players, 1);
 			expect(result).to.equal(poolList);
 		});
 	});
@@ -116,6 +133,17 @@ describe('Tournament', function() {
 			expect(tournament.getCollisionScore).to.be.calledOnce;
 			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
 			expect(result).to.equal(0.5);
+		});
+
+		it('uses default target of 0', function() {
+			let tournament = new Tournament([]);
+			sandbox.stub(tournament, 'getCollisionScore').returns(4);
+
+			let result = tournament.calculateFitnessScore();
+
+			expect(tournament.getCollisionScore).to.be.calledOnce;
+			expect(tournament.getCollisionScore).to.be.calledOn(tournament);
+			expect(result).to.equal(0.25);
 		});
 	});
 
