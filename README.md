@@ -214,7 +214,7 @@ This should display the version of `csc-tools` that you have installed.
 ## Using csc-tools
 
 To use csc tools, you'll want to start by having a
-(csv)[https://en.wikipedia.org/wiki/Comma-separated_values] file somewhere
+[csv](https://en.wikipedia.org/wiki/Comma-separated_values) file somewhere
 containing your list of players, in seed order. I chose csv for this purpose
 because its easily downloaded from Google Sheets, which I use for most of my
 organizational work. Other formats might be supported in the future, but for
