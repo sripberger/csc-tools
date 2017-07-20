@@ -1,5 +1,4 @@
 const Tournament = require('../../lib/tournament');
-// TODO: Add gene-lib dependency once it is published.
 const { Individual } = require('gene-lib');
 const sinon = require('sinon');
 const RankList = require('../../lib/rank-list');
