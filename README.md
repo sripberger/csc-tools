@@ -33,21 +33,21 @@ sorted the following list of players based on known skill level from power
 rankings and previous events:
 
 1. Fox
-- Falco
-- Marth
-- Sheik
-- Jigglypuff
-- Peach
-- Ice Climbers
-- Captain Falcon
-- Pikachu
-- Samus
-- Dr. Mario
-- Yoshi
-- Luigi
-- Ganondorf
-- Mario
-- Young Link
+2. Falco
+3. Marth
+4. Sheik
+5. Jigglypuff
+6. Peach
+7. Ice Climbers
+8. Captain Falcon
+9. Pikachu
+10. Samus
+11. Dr. Mario
+12. Yoshi
+13. Luigi
+14. Ganondorf
+15. Mario
+16. Young Link
 
 I would then arrange players into 4 pools using a *snake-style* seeding pattern,
 which is widely regarded as the most fair pattern and is used by
