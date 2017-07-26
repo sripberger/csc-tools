@@ -113,6 +113,7 @@ describe('index', function() {
 			expect(geneLib.run).to.be.calledOnce;
 			expect(geneLib.run).to.be.calledOn(geneLib);
 			expect(geneLib.run).to.be.calledWith({
+				generationLimit: 1000,
 				crossoverRate: 0.2,
 				mutationRate: 0.05,
 				createIndividual: factory
