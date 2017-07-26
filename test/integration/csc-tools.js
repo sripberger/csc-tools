@@ -1,6 +1,6 @@
 const cscTools = require('../../lib');
-const csc5Players = require('../data/csc5-players.json');
-const csc5Analysis = require('../data/csc5-analysis.json');
+const players = require('../data/players.json');
+const analysis = require('../data/analysis.json');
 
 describe('csc-tools', function() {
 	const poolCount = 16;
@@ -8,17 +8,17 @@ describe('csc-tools', function() {
 
 	describe('::analyze', function() {
 		it('returns analysis of provided player list', function() {
-			expect(cscTools.analyze(csc5Players, poolCount))
-				.to.deep.equal(csc5Analysis);
+			expect(cscTools.analyze(players, poolCount))
+				.to.deep.equal(analysis);
 		});
 	});
 
 	describe('::solve', function() {
 		it('minimizes regional collisions in pools', function() {
-			let solution = cscTools.solve(csc5Players, poolCount);
+			let solution = cscTools.solve(players, poolCount);
 			let { collisionScore } = cscTools.analyze(solution, poolCount);
 
-			expect(collisionScore).to.equal(csc5Analysis.minimumCollisionScore);
+			expect(collisionScore).to.equal(analysis.minimumCollisionScore);
 		});
 	});
 });
