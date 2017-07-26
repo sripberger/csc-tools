@@ -118,35 +118,35 @@ describe('RankList', function() {
 	});
 
 	describe('#crossover', function() {
-		it('returns copies with ranks exchanged within crossover range', function() {
+		it('returns copies with ranks exchanged at crossover indices', function() {
 			let foo = new RankList();
 			let bar = new RankList();
 			_.times(4 ,(index) => {
 				foo.ranks.push(new Rank([ { tag: 'bar', index } ]));
 				bar.ranks.push(new Rank([ { tag: 'bar', index } ]));
 			});
-			sandbox.stub(geneLib, 'getCrossoverRange').returns([ 1, 3 ]);
+			sandbox.stub(geneLib, 'getCrossoverIndices').returns([ 1, 3 ]);
 
 			let result = foo.crossover(bar);
 
-			expect(geneLib.getCrossoverRange).to.be.calledOnce;
-			expect(geneLib.getCrossoverRange).to.be.calledOn(geneLib);
-			expect(geneLib.getCrossoverRange).to.be.calledWith(4);
+			expect(geneLib.getCrossoverIndices).to.be.calledOnce;
+			expect(geneLib.getCrossoverIndices).to.be.calledOn(geneLib);
+			expect(geneLib.getCrossoverIndices).to.be.calledWith(4);
 			expect(result).to.be.an.instanceof(Array);
 			expect(result).to.have.length(2);
 			expect(result[0]).to.be.an.instanceof(RankList);
 			expect(result[0].ranks).to.deep.equal([
 				foo.ranks[0],
 				bar.ranks[1],
-				bar.ranks[2],
-				foo.ranks[3]
+				foo.ranks[2],
+				bar.ranks[3]
 			]);
 			expect(result[1]).to.be.an.instanceof(RankList);
 			expect(result[1].ranks).to.deep.equal([
 				bar.ranks[0],
 				foo.ranks[1],
-				foo.ranks[2],
-				bar.ranks[3]
+				bar.ranks[2],
+				foo.ranks[3]
 			]);
 		});
 	});
