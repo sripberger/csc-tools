@@ -70,7 +70,7 @@ program
 						let playerTable = cliff.stringifyObjectRows(
 							players,
 							[ 'tag', 'rank', 'region' ],
-							[ 'cyan', 'rank', 'cyan' ]
+							[ 'cyan', 'cyan', 'cyan' ]
 						);
 
 						if (collisionScore > 0) {
