@@ -264,7 +264,7 @@ example, I would do the following. If you do the same, you'll want to replace
 cd C:\Users\Steve\Desktop
 ```
 
-Now that we're in the same directory as our csv file, we can run `csv-tools`
+Now that we're in the same directory as our csv file, we can run `csc-tools`
 to check on the status and perform the minimization.
 
 ### The Analyze Tool
@@ -285,16 +285,16 @@ for larger tournaments), and `players.csv` is the name of my file.
 This command will cause the following to be logged into the terminal:
 
 ```
-collisionScore:        4
-minimumCollisionScore: 2
-ignoredRegion:         Brockway
+collisionScore:        8
+minimumCollisionScore: 4
 ```
 
 - The `collisionScore` is based on the number of regional collisions. It isn't
-exactly linear, meaning this result doesn't mean there are exactly 4 collisions.
-In fact, there are only two collisions occurring right now, but since one of
-them involves three players instead of just two, it's considered more severe.
-The key thing to take away here is that lower is better, and higher is worse.
+exactly linear, meaning this result doesn't mean there are exactly eight
+collisions. In fact, there are only four collisions occurring right now, but
+since two of them involve three players instead of just two, they're considered
+more severe. The key thing to take away here is that lower is better, and higher
+is worse.
 
 - The `minimumCollisionScore` is based on the total number of players in each
 region. It represents the absolute smallest `collisionScore` that can possibly
@@ -303,15 +303,7 @@ and our `minimumCollisionScore` to be the same. This will not *necessarily* be
 possible without moving players outside of their ranks, but `csc-tools` will
 get as close as it possibly can when we run the `solve` tool later.
 
-- The `ignoredRegion` is the most frequently-occurring region in the player
-list. It will be ignored in collision calculations, since minimizing collisions
-among the other regions will necessarily minimize collisions in this region as
-well. Leaving it out significantly speeds up the process at no cost. Normally,
-the ignored region will be the home region of the tourmament since most entrants
-will be from there. For Cincinnati Smash Classic, this will almost always be
-Cincinnati, for example.
-
-This short anaylsis seen above is all well and good, but sometimes you might
+This short analysis seen above is all well and good, but sometimes you might
 want some more detail.
 
 #### Showing Region Counts
@@ -324,9 +316,8 @@ csc-tools analyze -r 4 players.csv
 Which will output the following:
 
 ```
-collisionScore:        4
-minimumCollisionScore: 2
-ignoredRegion:         Brockway
+collisionScore:        8
+minimumCollisionScore: 4
 
 Region Counts
 Brockway:         6
@@ -334,12 +325,10 @@ Ogdenville:       6
 North Haverbrook: 4
 ```
 
-This is nice because it helps us verify some of the information above. We know
-that Brockway works as the `ignoredRegion`, since no other region has more
-players. We also know that the `minimumCollisionScore` of 2 is correct, because
-two collisions are necessary. Brockway is ignored, but there are two more
-Ogdenville players than there are pools. Each of these overflowing players
-will cause at least one collision, no matter what we do.
+This is nice because it helps us verify the `minimumCollisionScore`. We know
+that 4 is correct, because four collisions are necessary. Ogdenville and
+Brockway each have two more players than there are pools, and each of these 4
+overflowing players will cause at least one collision, no matter what we do.
 
 #### Showing Pools
 To actually display the pools in analysis, include the -p flag, like so:
@@ -351,41 +340,42 @@ csc-tools analyze -p 4 players.csv
 Which will output the following:
 
 ```
-collisionScore:        4
-minimumCollisionScore: 2
-ignoredRegion:         Brockway
+collisionScore:        8
+minimumCollisionScore: 4
 
-Pool 1 (collisionScore: 0)
-tag            region
-Fox            Brockway
-Captain Falcon Brockway
-Pikachu        North Haverbrook
-Young Link     Ogdenville
+Pool 1 (collisionScore: 1)
+tag            rank region
+Fox            1    Brockway
+Captain Falcon 4    Brockway
+Pikachu        5    North Haverbrook
+Young Link     7    Ogdenville
 
 Pool 2 (collisionScore: 3)
-tag          region
-Falco        Ogdenville
-Ice Climbers Ogdenville
-Samus        Ogdenville
-Mario        North Haverbrook
+tag          rank region
+Falco        2    Ogdenville
+Ice Climbers 4    Ogdenville
+Samus        5    Ogdenville
+Mario        7    North Haverbrook
 
 Pool 3 (collisionScore: 1)
-tag       region
-Marth     Brockway
-Peach     North Haverbrook
-Dr. Mario North Haverbrook
-Ganondorf Ogdenville
+tag       rank region
+Marth     2    Brockway
+Peach     3    North Haverbrook
+Dr. Mario 6    North Haverbrook
+Ganondorf 7    Ogdenville
 
-Pool 4 (collisionScore: 0)
-tag        region
-Sheik      Brockway
-Jigglypuff Ogdenville
-Yoshi      Brockway
-Luigi      Brockway
+Pool 4 (collisionScore: 3)
+tag        rank region
+Sheik      2    Brockway
+Jigglypuff 3    Ogdenville
+Yoshi      6    Brockway
+Luigi      6    Brockway
 ```
 
 We can use this to preview the pools, as well as trace the sources of the
-total collision score. As we can see, our problem pools are 2 and 3.
+total collision score. As we can see, pools 2 and 4 our our main problem pools.
+Pool 3 could use some adjustment as well, seeing as North Haverbrook only as
+four players and thus should not have any collisions at all.
 
 #### Showing Everything
 If you wish, you can combine the r and p flags, like so:
@@ -397,42 +387,41 @@ csc-tools analyze -rp players.csv
 Which will output everything:
 
 ```
-collisionScore:        4
-minimumCollisionScore: 2
-ignoredRegion:         Brockway
+collisionScore:        8
+minimumCollisionScore: 4
 
 Region Counts
 Brockway:         6
 Ogdenville:       6
 North Haverbrook: 4
 
-Pool 1 (collisionScore: 0)
-tag            region
-Fox            Brockway
-Captain Falcon Brockway
-Pikachu        North Haverbrook
-Young Link     Ogdenville
+Pool 1 (collisionScore: 1)
+tag            rank region
+Fox            1    Brockway
+Captain Falcon 4    Brockway
+Pikachu        5    North Haverbrook
+Young Link     7    Ogdenville
 
 Pool 2 (collisionScore: 3)
-tag          region
-Falco        Ogdenville
-Ice Climbers Ogdenville
-Samus        Ogdenville
-Mario        North Haverbrook
+tag          rank region
+Falco        2    Ogdenville
+Ice Climbers 4    Ogdenville
+Samus        5    Ogdenville
+Mario        7    North Haverbrook
 
 Pool 3 (collisionScore: 1)
-tag       region
-Marth     Brockway
-Peach     North Haverbrook
-Dr. Mario North Haverbrook
-Ganondorf Ogdenville
+tag       rank region
+Marth     2    Brockway
+Peach     3    North Haverbrook
+Dr. Mario 6    North Haverbrook
+Ganondorf 7    Ogdenville
 
-Pool 4 (collisionScore: 0)
-tag        region
-Sheik      Brockway
-Jigglypuff Ogdenville
-Yoshi      Brockway
-Luigi      Brockway
+Pool 4 (collisionScore: 3)
+tag        rank region
+Sheik      2    Brockway
+Jigglypuff 3    Ogdenville
+Yoshi      6    Brockway
+Luigi      6    Brockway
 ```
 
 For a large tournament this can be a lot of information cluttering your console,
@@ -459,42 +448,52 @@ csc-tools analyze 4 players-optimized.csv
 ```
 
 ```
-collisionScore:        2
-minimumCollisionScore: 2
-ignoredRegion:         Brockway
+collisionScore:        4
+minimumCollisionScore: 4
 
-Pool 1 (collisionScore: 0)
-tag            region
-Fox            Brockway
-Captain Falcon Brockway
-Samus          Ogdenville
-Mario          North Haverbrook
+Region Counts
+Brockway:         6
+Ogdenville:       6
+North Haverbrook: 4
+
+Pool 1 (collisionScore: 1)
+tag          rank region
+Fox          1    Brockway
+Ice Climbers 4    Ogdenville
+Samus        5    Ogdenville
+Mario        7    North Haverbrook
 
 Pool 2 (collisionScore: 1)
-tag          region
-Sheik        Brockway
-Ice Climbers Ogdenville
-Pikachu      North Haverbrook
-Young Link   Ogdenville
+tag            rank region
+Sheik          2    Brockway
+Captain Falcon 4    Brockway
+Pikachu        5    North Haverbrook
+Ganondorf      7    Ogdenville
 
-Pool 3 (collisionScore: 0)
-tag       region
-Marth     Brockway
-Peach     North Haverbrook
-Yoshi     Brockway
-Ganondorf Ogdenville
+Pool 3 (collisionScore: 1)
+tag        rank region
+Marth      2    Brockway
+Jigglypuff 3    Ogdenville
+Dr. Mario  6    North Haverbrook
+Young Link 7    Ogdenville
 
 Pool 4 (collisionScore: 1)
-tag        region
-Falco      Ogdenville
-Jigglypuff Ogdenville
-Dr. Mario  North Haverbrook
-Luigi      Brockway
+tag   rank region
+Falco 2    Ogdenville
+Peach 3    North Haverbrook
+Yoshi 6    Brockway
+Luigi 6    Brockway
 ```
 
 As you can see, the collisions have now been minimized. Now, we're free to
 take `players-optimized.csv` and upload it into Google Sheets or copy it into
 smash.gg or some other service.
+
+If you find that the solve tool takes a long time and can't seem to hit that
+mimimum collision score, this probably means that your rankings are too strict
+and that truly minimizing collisions is not possible without moving some
+players outside of their ranks. You can remedy this by merging some of your
+ranks together and running the solve tool again.
 
 This should be all you need to know for basic use. The rest of this README
 is stuff for nerds that may or may not interest you.
@@ -578,7 +577,6 @@ let analysis = cscTools.analyze(optimizedPlayers, 4);
 // {
 // 	collisionScore: 2,
 // 	minimumCollisionScore: 2,
-// 	ignoredRegion: 'Brockway',
 // 	regionCounts: {
 // 		'Brockway': 6,
 // 		'Ogdenville': 6,
