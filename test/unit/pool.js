@@ -64,14 +64,5 @@ describe('Pool', function() {
 
 			expect( pool.getCollisionScore()).to.equal(9);
 		});
-
-		it('ignores provided region, if any', function() {
-			utils.getRegionCounts.returns({
-				foo: 10, // should be ignored
-				bar: 5, // 4 collisions: 1 + 2 + 3 + 4 = 10
-			});
-
-			expect( pool.getCollisionScore('foo')).to.equal(10);
-		});
 	});
 });

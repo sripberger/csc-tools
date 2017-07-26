@@ -105,8 +105,7 @@ describe('Tournament', function() {
 
 	describe('#getCollisionScore', function() {
 		it('returns collision score from pool list', function() {
-			let ignoredRegion = 'baz';
-			let tournament = new Tournament(new RankList(), { ignoredRegion });
+			let tournament = new Tournament();
 			let poolList = new PoolList();
 			sinon.stub(tournament, 'getPoolList').returns(poolList);
 			sinon.stub(poolList, 'getCollisionScore').returns(5);
@@ -117,7 +116,6 @@ describe('Tournament', function() {
 			expect(tournament.getPoolList).to.be.calledOn(tournament);
 			expect(poolList.getCollisionScore).to.be.calledOnce;
 			expect(poolList.getCollisionScore).to.be.calledOn(poolList);
-			expect(poolList.getCollisionScore).to.be.calledWith(ignoredRegion);
 			expect(result).to.equal(5);
 		});
 	});

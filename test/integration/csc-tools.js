@@ -4,6 +4,7 @@ const csc5Analysis = require('../data/csc5-analysis.json');
 
 describe('csc-tools', function() {
 	const poolCount = 16;
+	this.timeout(10000);
 
 	describe('::analyze', function() {
 		it('returns analysis of provided player list', function() {

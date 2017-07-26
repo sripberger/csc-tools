@@ -95,44 +95,12 @@ describe('TournamentGenerator', function() {
 		});
 	});
 
-	describe('#getIgnoredRegion', function() {
-		let generator;
-
-		beforeEach(function() {
-			generator = new TournamentGenerator();
-			sandbox.stub(generator, 'getRegionCounts').returns({
-				foo: 1,
-				bar: 3,
-				baz: 2
-			});
-		});
-
-		it('returns the region with the highest count', function() {
-			let result = generator.getIgnoredRegion();
-
-			expect(generator.getRegionCounts).to.be.calledOnce;
-			expect(generator.getRegionCounts).to.be.calledOn(generator);
-			expect(result).to.equal('bar');
-		});
-
-		it('caches result', function() {
-			generator.getIgnoredRegion();
-			sandbox.resetHistory();
-
-			let result = generator.getIgnoredRegion();
-
-			expect(generator.getRegionCounts).to.not.be.called;
-			expect(result).to.equal('bar');
-		});
-	});
-
 	describe('#getMinimumCollisionScore', function() {
 		let generator;
 
 		beforeEach(function() {
 			generator = new TournamentGenerator(new RankList(), 4);
 			sandbox.stub(generator, 'getRegionCounts').returns({ foo: 1, bar: 2 });
-			sandbox.stub(generator, 'getIgnoredRegion').returns('baz');
 			sandbox.stub(utils, 'getMinimumCollisionScore').returns(42);
 		});
 
@@ -141,14 +109,11 @@ describe('TournamentGenerator', function() {
 
 			expect(generator.getRegionCounts).to.be.calledOnce;
 			expect(generator.getRegionCounts).to.be.calledOn(generator);
-			expect(generator.getIgnoredRegion).to.be.calledOnce;
-			expect(generator.getIgnoredRegion).to.be.calledOn(generator);
 			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
 			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
 			expect(utils.getMinimumCollisionScore).to.be.calledWith(
 				{ foo: 1, bar: 2 },
-				generator.poolCount,
-				'baz'
+				generator.poolCount
 			);
 			expect(result).to.equal(42);
 		});
@@ -160,7 +125,6 @@ describe('TournamentGenerator', function() {
 			let result = generator.getMinimumCollisionScore();
 
 			expect(generator.getRegionCounts).to.not.be.called;
-			expect(generator.getIgnoredRegion).to.not.be.called;
 			expect(utils.getMinimumCollisionScore).to.not.be.called;
 			expect(result).to.equal(42);
 		});
@@ -173,20 +137,17 @@ describe('TournamentGenerator', function() {
 			let result = generator.getMinimumCollisionScore();
 
 			expect(generator.getRegionCounts).to.not.be.called;
-			expect(generator.getIgnoredRegion).to.not.be.called;
 			expect(utils.getMinimumCollisionScore).to.not.be.called;
 			expect(result).to.equal(0);
 		});
 	});
 
 	describe('#getTournamentSettings', function() {
-		const ignoredRegion = 'ignoredRegion';
 		const minimumCollisionScore = 42;
 		let generator;
 
 		beforeEach(function() {
 			generator = new TournamentGenerator(new RankList(), 4);
-			sandbox.stub(generator, 'getIgnoredRegion').returns(ignoredRegion);
 			sandbox.stub(generator, 'getMinimumCollisionScore')
 				.returns(minimumCollisionScore);
 		});
@@ -194,13 +155,10 @@ describe('TournamentGenerator', function() {
 		it('returns a settings object for generated tournaments', function() {
 			let result = generator.getTournamentSettings();
 
-			expect(generator.getIgnoredRegion).to.be.calledOnce;
-			expect(generator.getIgnoredRegion).to.be.calledOn(generator);
 			expect(generator.getMinimumCollisionScore).to.be.calledOnce;
 			expect(generator.getMinimumCollisionScore).to.be.calledOn(generator);
 			expect(result).to.deep.equal({
 				poolCount: generator.poolCount,
-				ignoredRegion,
 				targetCollisionScore: minimumCollisionScore
 			});
 		});
@@ -211,7 +169,6 @@ describe('TournamentGenerator', function() {
 
 			let secondResult = generator.getTournamentSettings();
 
-			expect(generator.getIgnoredRegion).to.not.be.called;
 			expect(generator.getMinimumCollisionScore).to.not.be.called;
 			expect(secondResult).to.equal(firstResult);
 		});

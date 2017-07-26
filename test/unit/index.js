@@ -20,7 +20,6 @@ describe('index', function() {
 
 	describe('::analyze', function() {
 		const poolCount = 4;
-		const ignoredRegion = 'ignored region';
 		let players, regionCounts, poolList, poolAnalysis, result;
 
 		beforeEach(function() {
@@ -30,7 +29,6 @@ describe('index', function() {
 			poolAnalysis = [ { pool: 1 }, { pool: 2 } ];
 
 			sandbox.stub(utils, 'getRegionCounts').returns(regionCounts);
-			sandbox.stub(utils, 'getIgnoredRegion').returns(ignoredRegion);
 			sandbox.stub(PoolList, 'create').returns(poolList);
 			sandbox.stub(poolList, 'getCollisionScore').returns(5);
 			sandbox.stub(poolList, 'analyzePools').returns(poolAnalysis);
@@ -43,29 +41,22 @@ describe('index', function() {
 			expect(utils.getRegionCounts).to.be.calledOnce;
 			expect(utils.getRegionCounts).to.be.calledOn(utils);
 			expect(utils.getRegionCounts).to.be.calledWith(players);
-			expect(utils.getIgnoredRegion).to.be.calledOnce;
-			expect(utils.getIgnoredRegion).to.be.calledOn(utils);
-			expect(utils.getIgnoredRegion).to.be.calledWith(regionCounts);
 			expect(PoolList.create).to.be.calledOnce;
 			expect(PoolList.create).to.be.calledOn(PoolList);
 			expect(PoolList.create).to.be.calledWith(players, poolCount);
 			expect(poolList.getCollisionScore).to.be.calledOnce;
 			expect(poolList.getCollisionScore).to.be.calledOn(poolList);
-			expect(poolList.getCollisionScore).to.be.calledWith(ignoredRegion);
 			expect(poolList.analyzePools).to.be.calledOnce;
 			expect(poolList.analyzePools).to.be.calledOn(poolList);
-			expect(poolList.analyzePools).to.be.calledWith(ignoredRegion);
 			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
 			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
 			expect(utils.getMinimumCollisionScore).to.be.calledWith(
 				regionCounts,
-				poolCount,
-				ignoredRegion
+				poolCount
 			);
 			expect(result).to.deep.equal({
 				collisionScore: 5,
 				minimumCollisionScore: 4,
-				ignoredRegion,
 				regionCounts,
 				pools: poolAnalysis
 			});
@@ -75,7 +66,6 @@ describe('index', function() {
 			expect(_.keys(result)).to.deep.equal([
 				'collisionScore',
 				'minimumCollisionScore',
-				'ignoredRegion',
 				'regionCounts',
 				'pools'
 			]);

@@ -64,20 +64,6 @@ describe('utils', function() {
 		});
 	});
 
-	describe('::getIgnoredRegion', function() {
-		it('returns the region with the highest count', function() {
-			expect(utils.getIgnoredRegion({
-				foo: 1,
-				bar: 3,
-				baz: 2
-			})).to.equal('bar');
-		});
-
-		it('returns null if region counts are empty', function() {
-			expect(utils.getIgnoredRegion({})).to.be.null;
-		});
-	});
-
 	describe('::getMinimumCollisionScore', function() {
 		it('returns smallest possible collision score based on region counts and pool count', function() {
 			expect(utils.getMinimumCollisionScore({
@@ -95,13 +81,6 @@ describe('utils', function() {
 				baz: 8, // 4 single collisions, (4 * 1)  = 4
 				qux: 3 // 0 collisions
 			}, 4)).to.equal(31);
-		});
-
-		it('supports ignoredRegion argument', function() {
-			expect(utils.getMinimumCollisionScore({
-				foo: 5, // Should be ignored
-				bar: 6 // 2 single collisions
-			}, 4, 'foo')).to.equal(2);
 		});
 	});
 });
