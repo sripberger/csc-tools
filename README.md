@@ -285,8 +285,9 @@ for larger tournaments), and `players.csv` is the name of my file.
 This command will cause the following to be logged into the terminal:
 
 ```
-collisionScore:    8
-minCollisionScore: 4
+collisionScore:        8
+minCollisionScore:     4
+minPoolCollisionScore: 0
 ```
 
 - The `collisionScore` is based on the number of regional collisions. It isn't
@@ -303,6 +304,15 @@ and our `minCollisionScore` to be the same. This will not *necessarily* be
 possible without moving players outside of their ranks, but `csc-tools` will
 get as close as it possibly can when we run the `solve` tool later.
 
+- The `minPoolCollisionScore` is also based on the total number of players in
+each region. It represents the smallest number that an individual pool can
+possibly contribute to the total `collisionScore` in the case of a solution.
+Individual pools might have lower scores, but not without other pools having
+higher scores as a result. In this case, the `minPoolCollisionScore` is zero,
+meaning that an optimized result might have at least one pool with no
+collisions at all. This isn't all that useful, but it can make it easier to
+identify problem pools at a glance.
+
 This short analysis seen above is all well and good, but sometimes you might
 want some more detail.
 
@@ -316,8 +326,9 @@ csc-tools analyze -r 4 players.csv
 Which will output the following:
 
 ```
-collisionScore:    8
-minCollisionScore: 4
+collisionScore:        8
+minCollisionScore:     4
+minPoolCollisionScore: 0
 
 Region Counts
 Brockway:         6
@@ -340,8 +351,9 @@ csc-tools analyze -p 4 players.csv
 Which will output the following:
 
 ```
-collisionScore:    8
-minCollisionScore: 4
+collisionScore:        8
+minCollisionScore:     4
+minPoolCollisionScore: 0
 
 Pool 1 (collisionScore: 1)
 tag            rank region
@@ -387,8 +399,9 @@ csc-tools analyze -rp players.csv
 Which will output everything:
 
 ```
-collisionScore:    8
-minCollisionScore: 4
+collisionScore:        8
+minCollisionScore:     4
+minPoolCollisionScore: 0
 
 Region Counts
 Brockway:         6
@@ -444,17 +457,13 @@ to instead redirect it into a file, in this case one named
 Now, let's try analyzing this new file:
 
 ```
-csc-tools analyze 4 players-optimized.csv
+csc-tools analyze -p 4 players-optimized.csv
 ```
 
 ```
-collisionScore:    4
-minCollisionScore: 4
-
-Region Counts
-Brockway:         6
-Ogdenville:       6
-North Haverbrook: 4
+collisionScore:        4
+minCollisionScore:     4
+minPoolCollisionScore: 0
 
 Pool 1 (collisionScore: 1)
 tag          rank region
@@ -465,24 +474,24 @@ Mario        7    North Haverbrook
 
 Pool 2 (collisionScore: 1)
 tag            rank region
-Sheik          2    Brockway
+Falco          2    Ogdenville
 Captain Falcon 4    Brockway
 Pikachu        5    North Haverbrook
-Ganondorf      7    Ogdenville
+Young Link     7    Ogdenville
 
 Pool 3 (collisionScore: 1)
+tag       rank region
+Sheik     2    Brockway
+Peach     3    North Haverbrook
+Yoshi     6    Brockway
+Ganondorf 7    Ogdenville
+
+Pool 4 (collisionScore: 1)
 tag        rank region
 Marth      2    Brockway
 Jigglypuff 3    Ogdenville
+Luigi      6    Brockway
 Dr. Mario  6    North Haverbrook
-Young Link 7    Ogdenville
-
-Pool 4 (collisionScore: 1)
-tag   rank region
-Falco 2    Ogdenville
-Peach 3    North Haverbrook
-Yoshi 6    Brockway
-Luigi 6    Brockway
 ```
 
 As you can see, the collisions have now been minimized. Now, we're free to
