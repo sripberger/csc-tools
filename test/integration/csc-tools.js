@@ -18,7 +18,7 @@ describe('csc-tools', function() {
 			let solution = cscTools.solve(players, poolCount);
 			let { collisionScore } = cscTools.analyze(solution, poolCount);
 
-			expect(collisionScore).to.equal(analysis.minimumCollisionScore);
+			expect(collisionScore).to.equal(analysis.minCollisionScore);
 		});
 	});
 });

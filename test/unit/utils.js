@@ -64,9 +64,9 @@ describe('utils', function() {
 		});
 	});
 
-	describe('::getMinimumCollisionScore', function() {
+	describe('::getMinCollisionScore', function() {
 		it('returns smallest possible collision score based on region counts and pool count', function() {
-			expect(utils.getMinimumCollisionScore({
+			expect(utils.getMinCollisionScore({
 				foo: 4, // 1 single collision
 				bar: 5, // 2 single collisions
 				baz: 3, // 0 collisions
@@ -75,7 +75,7 @@ describe('utils', function() {
 		});
 
 		it('accounts for collisions with more than one duplicate', function() {
-			expect(utils.getMinimumCollisionScore({
+			expect(utils.getMinCollisionScore({
 				foo: 9, // 3 single collisions, 1 double collision, (3 * 1) + (1 * 3) = 6
 				bar: 15, // 1 double collision, 3 triple collisions, (1 * 3) + (3 * 6) = 21
 				baz: 8, // 4 single collisions, (4 * 1)  = 4

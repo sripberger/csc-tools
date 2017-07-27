@@ -95,23 +95,23 @@ describe('TournamentGenerator', function() {
 		});
 	});
 
-	describe('#getMinimumCollisionScore', function() {
+	describe('#getMinCollisionScore', function() {
 		let generator;
 
 		beforeEach(function() {
 			generator = new TournamentGenerator(new RankList(), 4);
 			sandbox.stub(generator, 'getRegionCounts').returns({ foo: 1, bar: 2 });
-			sandbox.stub(utils, 'getMinimumCollisionScore').returns(42);
+			sandbox.stub(utils, 'getMinCollisionScore').returns(42);
 		});
 
-		it('returns minimum collison score using utils::getMinimumCollisionScore', function() {
-			let result = generator.getMinimumCollisionScore();
+		it('returns minimum collison score using utils::getMinCollisionScore', function() {
+			let result = generator.getMinCollisionScore();
 
 			expect(generator.getRegionCounts).to.be.calledOnce;
 			expect(generator.getRegionCounts).to.be.calledOn(generator);
-			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
-			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
-			expect(utils.getMinimumCollisionScore).to.be.calledWith(
+			expect(utils.getMinCollisionScore).to.be.calledOnce;
+			expect(utils.getMinCollisionScore).to.be.calledOn(utils);
+			expect(utils.getMinCollisionScore).to.be.calledWith(
 				{ foo: 1, bar: 2 },
 				generator.poolCount
 			);
@@ -119,47 +119,47 @@ describe('TournamentGenerator', function() {
 		});
 
 		it('caches nonzero result', function() {
-			generator.getMinimumCollisionScore();
+			generator.getMinCollisionScore();
 			sandbox.resetHistory();
 
-			let result = generator.getMinimumCollisionScore();
+			let result = generator.getMinCollisionScore();
 
 			expect(generator.getRegionCounts).to.not.be.called;
-			expect(utils.getMinimumCollisionScore).to.not.be.called;
+			expect(utils.getMinCollisionScore).to.not.be.called;
 			expect(result).to.equal(42);
 		});
 
 		it('caches zero result', function() {
-			utils.getMinimumCollisionScore.returns(0);
-			generator.getMinimumCollisionScore();
+			utils.getMinCollisionScore.returns(0);
+			generator.getMinCollisionScore();
 			sandbox.resetHistory();
 
-			let result = generator.getMinimumCollisionScore();
+			let result = generator.getMinCollisionScore();
 
 			expect(generator.getRegionCounts).to.not.be.called;
-			expect(utils.getMinimumCollisionScore).to.not.be.called;
+			expect(utils.getMinCollisionScore).to.not.be.called;
 			expect(result).to.equal(0);
 		});
 	});
 
 	describe('#getTournamentSettings', function() {
-		const minimumCollisionScore = 42;
+		const minCollisionScore = 42;
 		let generator;
 
 		beforeEach(function() {
 			generator = new TournamentGenerator(new RankList(), 4);
-			sandbox.stub(generator, 'getMinimumCollisionScore')
-				.returns(minimumCollisionScore);
+			sandbox.stub(generator, 'getMinCollisionScore')
+				.returns(minCollisionScore);
 		});
 
 		it('returns a settings object for generated tournaments', function() {
 			let result = generator.getTournamentSettings();
 
-			expect(generator.getMinimumCollisionScore).to.be.calledOnce;
-			expect(generator.getMinimumCollisionScore).to.be.calledOn(generator);
+			expect(generator.getMinCollisionScore).to.be.calledOnce;
+			expect(generator.getMinCollisionScore).to.be.calledOn(generator);
 			expect(result).to.deep.equal({
 				poolCount: generator.poolCount,
-				targetCollisionScore: minimumCollisionScore
+				targetCollisionScore: minCollisionScore
 			});
 		});
 
@@ -169,7 +169,7 @@ describe('TournamentGenerator', function() {
 
 			let secondResult = generator.getTournamentSettings();
 
-			expect(generator.getMinimumCollisionScore).to.not.be.called;
+			expect(generator.getMinCollisionScore).to.not.be.called;
 			expect(secondResult).to.equal(firstResult);
 		});
 	});

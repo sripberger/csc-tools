@@ -32,7 +32,7 @@ describe('index', function() {
 			sandbox.stub(PoolList, 'create').returns(poolList);
 			sandbox.stub(poolList, 'getCollisionScore').returns(5);
 			sandbox.stub(poolList, 'analyzePools').returns(poolAnalysis);
-			sandbox.stub(utils, 'getMinimumCollisionScore').returns(4);
+			sandbox.stub(utils, 'getMinCollisionScore').returns(4);
 
 			result = cscTools.analyze(players, poolCount);
 		});
@@ -48,15 +48,15 @@ describe('index', function() {
 			expect(poolList.getCollisionScore).to.be.calledOn(poolList);
 			expect(poolList.analyzePools).to.be.calledOnce;
 			expect(poolList.analyzePools).to.be.calledOn(poolList);
-			expect(utils.getMinimumCollisionScore).to.be.calledOnce;
-			expect(utils.getMinimumCollisionScore).to.be.calledOn(utils);
-			expect(utils.getMinimumCollisionScore).to.be.calledWith(
+			expect(utils.getMinCollisionScore).to.be.calledOnce;
+			expect(utils.getMinCollisionScore).to.be.calledOn(utils);
+			expect(utils.getMinCollisionScore).to.be.calledWith(
 				regionCounts,
 				poolCount
 			);
 			expect(result).to.deep.equal({
 				collisionScore: 5,
-				minimumCollisionScore: 4,
+				minCollisionScore: 4,
 				regionCounts,
 				pools: poolAnalysis
 			});
@@ -65,7 +65,7 @@ describe('index', function() {
 		it('sorts keys appropriately for output', function() {
 			expect(_.keys(result)).to.deep.equal([
 				'collisionScore',
-				'minimumCollisionScore',
+				'minCollisionScore',
 				'regionCounts',
 				'pools'
 			]);

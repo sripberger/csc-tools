@@ -285,8 +285,8 @@ for larger tournaments), and `players.csv` is the name of my file.
 This command will cause the following to be logged into the terminal:
 
 ```
-collisionScore:        8
-minimumCollisionScore: 4
+collisionScore:    8
+minCollisionScore: 4
 ```
 
 - The `collisionScore` is based on the number of regional collisions. It isn't
@@ -296,10 +296,10 @@ since two of them involve three players instead of just two, they're considered
 more severe. The key thing to take away here is that lower is better, and higher
 is worse.
 
-- The `minimumCollisionScore` is based on the total number of players in each
+- The `minCollisionScore` is based on the total number of players in each
 region. It represents the absolute smallest `collisionScore` that can possibly
 be reached by shifting players around. Ideally, we'd like our `collisionScore`
-and our `minimumCollisionScore` to be the same. This will not *necessarily* be
+and our `minCollisionScore` to be the same. This will not *necessarily* be
 possible without moving players outside of their ranks, but `csc-tools` will
 get as close as it possibly can when we run the `solve` tool later.
 
@@ -316,8 +316,8 @@ csc-tools analyze -r 4 players.csv
 Which will output the following:
 
 ```
-collisionScore:        8
-minimumCollisionScore: 4
+collisionScore:    8
+minCollisionScore: 4
 
 Region Counts
 Brockway:         6
@@ -325,7 +325,7 @@ Ogdenville:       6
 North Haverbrook: 4
 ```
 
-This is nice because it helps us verify the `minimumCollisionScore`. We know
+This is nice because it helps us verify the `minCollisionScore`. We know
 that 4 is correct, because four collisions are necessary. Ogdenville and
 Brockway each have two more players than there are pools, and each of these 4
 overflowing players will cause at least one collision, no matter what we do.
@@ -340,8 +340,8 @@ csc-tools analyze -p 4 players.csv
 Which will output the following:
 
 ```
-collisionScore:        8
-minimumCollisionScore: 4
+collisionScore:    8
+minCollisionScore: 4
 
 Pool 1 (collisionScore: 1)
 tag            rank region
@@ -387,8 +387,8 @@ csc-tools analyze -rp players.csv
 Which will output everything:
 
 ```
-collisionScore:        8
-minimumCollisionScore: 4
+collisionScore:    8
+minCollisionScore: 4
 
 Region Counts
 Brockway:         6
@@ -448,8 +448,8 @@ csc-tools analyze 4 players-optimized.csv
 ```
 
 ```
-collisionScore:        4
-minimumCollisionScore: 4
+collisionScore:    4
+minCollisionScore: 4
 
 Region Counts
 Brockway:         6
@@ -490,7 +490,7 @@ take `players-optimized.csv` and upload it into Google Sheets or copy it into
 smash.gg or some other service.
 
 If you find that the solve tool takes a long time and can't seem to hit that
-mimimum collision score, this probably means that your rankings are too strict
+minimum collision score, this probably means that your rankings are too strict
 and that truly minimizing collisions is not possible without moving some
 players outside of their ranks. You can remedy this by merging some of your
 ranks together and running the solve tool again.
@@ -575,8 +575,8 @@ let analysis = cscTools.analyze(optimizedPlayers, 4);
 
 // analysis example:
 // {
-// 	collisionScore: 2,
-// 	minimumCollisionScore: 2,
+// 	collisionScore: 4,
+// 	minCollisionScore: 4,
 // 	regionCounts: {
 // 		'Brockway': 6,
 // 		'Ogdenville': 6,
@@ -593,7 +593,7 @@ let analysis = cscTools.analyze(optimizedPlayers, 4);
 // 			]
 // 		},
 // 		{
-// 			collisionScore: 0,
+// 			collisionScore: 1,
 // 			players: [
 // 				{ tag: 'Marth', rank: 2, region: 'Brockway' },
 // 				{ tag: 'Captain Falcon', rank: 4, region: 'Brockway' },
@@ -611,7 +611,7 @@ let analysis = cscTools.analyze(optimizedPlayers, 4);
 // 			]
 // 		},
 // 		{
-// 			collisionScore: 0,
+// 			collisionScore: 1,
 // 			players: [
 // 				{ tag: 'Falco', rank: 2, region: 'Ogdenville' },
 // 				{ tag: 'Peach', rank: 3, region: 'North Haverbrook' },
