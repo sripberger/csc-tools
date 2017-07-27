@@ -73,7 +73,7 @@ program
 							[ 'cyan', 'cyan', 'cyan' ]
 						);
 
-						if (collisionScore > 0) {
+						if (collisionScore > analysis.minPoolCollisionScore) {
 							scoreStr = colors.red(scoreStr);
 						} else {
 							scoreStr = colors.green(scoreStr);

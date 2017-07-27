@@ -1,6 +1,7 @@
 {
 	"collisionScore": 117,
 	"minCollisionScore": 100,
+	"minPoolCollisionScore": 6,
 	"regionCounts": {
 		"Cincinnati": 64,
 		"Columbus": 20,

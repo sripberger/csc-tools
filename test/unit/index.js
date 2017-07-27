@@ -33,6 +33,7 @@ describe('index', function() {
 			sandbox.stub(poolList, 'getCollisionScore').returns(5);
 			sandbox.stub(poolList, 'analyzePools').returns(poolAnalysis);
 			sandbox.stub(utils, 'getMinCollisionScore').returns(4);
+			sandbox.stub(utils, 'getMinPoolCollisionScore').returns(1);
 
 			result = cscTools.analyze(players, poolCount);
 		});
@@ -54,9 +55,16 @@ describe('index', function() {
 				regionCounts,
 				poolCount
 			);
+			expect(utils.getMinPoolCollisionScore).to.be.calledOnce;
+			expect(utils.getMinPoolCollisionScore).to.be.calledOn(utils);
+			expect(utils.getMinPoolCollisionScore).to.be.calledWith(
+				regionCounts,
+				poolCount
+			);
 			expect(result).to.deep.equal({
 				collisionScore: 5,
 				minCollisionScore: 4,
+				minPoolCollisionScore: 1,
 				regionCounts,
 				pools: poolAnalysis
 			});
@@ -66,6 +74,7 @@ describe('index', function() {
 			expect(_.keys(result)).to.deep.equal([
 				'collisionScore',
 				'minCollisionScore',
+				'minPoolCollisionScore',
 				'regionCounts',
 				'pools'
 			]);
